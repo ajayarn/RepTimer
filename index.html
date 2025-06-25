@@ -2,6 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Rep Timer</title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto&display=swap" rel="stylesheet">
   <style>
@@ -132,6 +133,33 @@
       text-align: right;
       margin-right: 10px;
       font-size: 18px;
+    }
+    @media only screen and (max-height: 500px) and (orientation: landscape) {
+      h1 {
+        font-size: 6vw;
+      }
+
+      input {
+        font-size: 4vw;
+        width: 20vw;
+      }
+
+      .buttons button {
+        font-size: 4vw;
+        padding: 2vw 4vw;
+      }
+
+      #status {
+        font-size: 4vw;
+      }
+
+      #message {
+        font-size: 4vw;
+      }
+
+      #motivationGif {
+        max-width: 50vw;
+      }
     }
   </style>
 </head>
