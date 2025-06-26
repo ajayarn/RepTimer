@@ -67,11 +67,12 @@ h1 {
 .reset-btn { background-color: #c0392b; }
 
 .start-btn:hover { background-color: #219150; }
-pause-btn:hover { background-color: #cf711a; }
+.pause-btn:hover { background-color: #cf711a; }
 .reset-btn:hover { background-color: #a8322b; }
 
 #status {
     /* margin: 10px; */
+    font-family: 'Bebas Neue', sans-serif;
     font-size: clamp(18px, 9vw, 30px);
     font-weight: bold;
     color: #f0f0f0;
