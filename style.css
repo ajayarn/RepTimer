@@ -11,7 +11,7 @@ body {
 h1 {
     font-family: 'Bebas Neue', sans-serif;
     letter-spacing: 2px;
-    font-size: clamp(28px, 8vw, 58px);
+    font-size: clamp(20px, 8vw, 40px);
     color: #f0f0f0;
     text-align: center;
 }
@@ -71,14 +71,16 @@ h1 {
 .reset-btn:hover { background-color: #a8322b; }
 
 #status {
-    /* margin: 10px; */
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(18px, 9vw, 30px);
-    font-weight: bold;
-    color: #f0f0f0;
-    text-align: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(24px, 12vw, 48px);
+  font-weight: bold;
+  color: #f0f0f0;
+  text-align: center;
+  line-height: 1.2;
+  text-shadow:
+    0 0 3px rgba(127, 127, 127, 0.6),
+    0 0 6px rgba(127, 127, 127, 0.4);
 }
-
 .progress-container {
     width: 90%;
     height: 24px;
