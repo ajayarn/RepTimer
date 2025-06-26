@@ -140,21 +140,21 @@ h1 {
     }
 
     .input-group label {
-    font-size: 5vw;
+    font-size: 7vw;
     }
 
     .input-group input {
-    font-size: 5vw;
+    font-size: 7vw;
     width: 30vw;
     }
 
     .buttons button {
-    font-size: 5vw;
-    padding: 3vw 5vw;
+    font-size: 7vw;
+    padding: 3vw 4vw;
     }
 
     #status, #message {
-    font-size: 5vw;
+    font-size: 7vw;
     }
 
     #motivationGif {

@@ -99,7 +99,9 @@ function startReps() {
         clearInterval(timer);
         timer = null;
         document.getElementById("status").textContent = "🎉 Workout Complete!";
-        document.getElementById("clapSound").play();
+        document.getElementById("clapSound").play().catch(err => {
+            console.warn("Clap sound blocked or failed:", err);
+        });
         document.getElementById("motivationGif").src = clappingGif;
         beep();
         updateProgress();
