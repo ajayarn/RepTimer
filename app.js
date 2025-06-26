@@ -76,7 +76,8 @@ function showMotivation() {
   }
 
   const msg = msgPool[Math.floor(Math.random() * msgPool.length)];
-  document.getElementById("status").textContent = `⏱️ Rep ${currentRep+1}/${reps}: ` + msg;
+  document.getElementById("status").textContent = `⏱️ Rep ${currentRep+1} of ${reps}`;
+  document.getElementById("message").textContent = msg;
 }
 
 function updateProgress() {
@@ -126,6 +127,7 @@ function startTimer() {
 
     
     document.getElementById("status").textContent = `⏳ Starting in 5...`;
+    
 
     prepTimer = setInterval(() => {
     if (paused) return;
@@ -133,7 +135,8 @@ function startTimer() {
         clearInterval(prepTimer);
         prepTimer = null;
         beep(); // signal start
-        document.getElementById("status").textContent = `💪 Let's go! Rep ${currentRep+1}!`;
+        document.getElementById("status").textContent = `💪 Let's gooo!`;
+        document.getElementById("message").textContent = `Do rep ${currentRep+1}`;
         document.getElementById("motivationGif").src = runningGif;
         startReps();
     } else {
@@ -151,6 +154,7 @@ function startReps() {
         clearInterval(timer);
         timer = null;
         document.getElementById("status").textContent = "🎉 Workout Complete!";
+        document.getElementById("message").textContent = `So proud of you!`;
         document.getElementById("clapSound").play().catch(err => {
             console.warn("Clap sound blocked or failed:", err);
         });
@@ -187,7 +191,7 @@ function resetTimer() {
     currentRep = 0;
     prepCountdown = 5;
     updateProgress();
-    document.getElementById("status").textContent = "🔁 Ready.";
+    document.getElementById("status").textContent = "🔁 Ready";
     document.getElementById("message").textContent = "";
     document.getElementById("motivationGif").src = readyGif;
     document.getElementById("input-box").style.display = "block";
