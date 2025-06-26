@@ -135,8 +135,8 @@ function startTimer() {
         clearInterval(prepTimer);
         prepTimer = null;
         beep(); // signal start
-        document.getElementById("status").textContent = `💪 Let's gooo!`;
-        document.getElementById("message").textContent = `Do rep ${currentRep+1}`;
+        document.getElementById("status").textContent = `💪 Let's go!`;
+        document.getElementById("message").textContent = `Rep ${currentRep+1}!`;
         document.getElementById("motivationGif").src = runningGif;
         startReps();
     } else {
@@ -167,7 +167,6 @@ function startReps() {
     } else {
         beep();
         showMotivation();
-        // document.getElementById("status").textContent = `⏱️ Rep ${currentRep+1} of ${reps}`;
         updateProgress();
     }
     }, interval * 1000);
