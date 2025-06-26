@@ -1,6 +1,7 @@
 body {
     font-family: 'Roboto', sans-serif;
-    background: #f1f1f1;
+    background: #121212;
+    color: #f0f0f0;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -10,8 +11,8 @@ body {
 h1 {
     font-family: 'Bebas Neue', sans-serif;
     letter-spacing: 2px;
-    font-size: 58px;
-    color: #2c3e50;
+    font-size: clamp(28px, 8vw, 58px);
+    color: #f0f0f0;
     text-align: center;
 }
 
@@ -21,22 +22,27 @@ h1 {
     justify-content: flex-start;
     margin: 10px 0;
     width: 100%;
-    max-width:300px;
+    max-width: 300px;
     flex-wrap: wrap;
 }
 
 .input-group label {
     flex: 1;
     text-align: right;
-    font-size: 18px;
+    font-size: clamp(10px, 5vw, 20px);
     margin-right: 10px;
+    color: #f0f0f0;
 }
 
 .input-group input {
-    flex: 0 0 80px;
+    flex: 0 0 auto;
     padding: 8px;
-    font-size: 16px;
-    width: 80px;
+    font-size: clamp(16px, 5vw, 24px);
+    width: clamp(80px, 20vw, 120px);
+    background: #1e1e1e;
+    color: #fff;
+    border: 1px solid #555;
+    border-radius: 4px;
 }
 
 .buttons {
@@ -48,8 +54,8 @@ h1 {
 }
 
 .buttons button {
-    padding: 12px 24px;
-    font-size: 18px;
+    padding: clamp(10px, 2vw, 16px) clamp(16px, 4vw, 20px);
+    font-size: clamp(14px, 5vw, 20px);
     border: none;
     border-radius: 6px;
     cursor: pointer;
@@ -61,21 +67,21 @@ h1 {
 .reset-btn { background-color: #c0392b; }
 
 .start-btn:hover { background-color: #219150; }
-.pause-btn:hover { background-color: #cf711a; }
+pause-btn:hover { background-color: #cf711a; }
 .reset-btn:hover { background-color: #a8322b; }
 
 #status {
     margin-top: 20px;
-    font-size: 24px;
+    font-size: clamp(18px, 5vw, 30px);
     font-weight: bold;
-    color: #333;
+    color: #f0f0f0;
     text-align: center;
 }
 
 .progress-container {
     width: 90%;
     height: 24px;
-    background: #ccc;
+    background: #444;
     border-radius: 12px;
     overflow: hidden;
     margin-top: 20px;
@@ -84,15 +90,22 @@ h1 {
 .progress-bar {
     height: 100%;
     width: 0%;
-    background: green;
+    background: limegreen;
     transition: width 0.5s, background-color 0.5s;
 }
 
 #message {
     margin-top: 20px;
-    font-size: 20px;
+    font-size: clamp(18px, 5vw, 30px);
     font-weight: 500;
     text-align: center;
+    color: #fff;
+}
+
+@keyframes glowPulse {
+  0%   { box-shadow: 0 0 10px rgba(255,255,255,0.3); }
+  50%  { box-shadow: 0 0 25px rgba(255,255,255,0.7); }
+  100% { box-shadow: 0 0 10px rgba(255,255,255,0.3); }
 }
 
 #motivationGif {
@@ -102,6 +115,7 @@ h1 {
     display: block;
     margin-left: auto;
     margin-right: auto;
+    animation: glowPulse 2s ease-in-out infinite;
 }
 
 #confetti-container {
@@ -136,39 +150,21 @@ h1 {
     }
 
     h1 {
-    font-size: 10vw;
-    }
-
-    .input-group label {
-    font-size: 7vw;
-    }
-
-    .input-group input {
-    font-size: 7vw;
-    width: 30vw;
-    }
-
-    .buttons button {
-    font-size: 7vw;
-    padding: 3vw 4vw;
-    }
-
-    #status, #message {
-    font-size: 7vw;
+        font-size: clamp(28px, 10vw, 58px);
     }
 
     #motivationGif {
-    max-width: 80vw;
+        max-width: 80vw;
     }
 }
 
 .input-box, .button-box {
-  border: 2px solid #ccc;
-  border-radius: 10px;
-  padding: 16px;
-  margin: 20px 0;
-  background: #fff;
-  width: 90%;
-  max-width: 400px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    border: 2px solid #333;
+    border-radius: 10px;
+    padding: 16px;
+    margin: 20px 0;
+    background: #1e1e1e;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.6);
 }

@@ -6,20 +6,43 @@ let paused = false;
 let prepCountdown = 5;
 let prepTimer = null;
 
-const earlyMessages = [
-    "You got this! 💪",
-    "Just getting warmed up!",
-    "Looking sharp!",
-    "Keep going, you're looking great!",
-    "Push through! 🚀"
+const motivationEarly = [ /* <33% */ 
+  "Every great session starts with one rep.",
+  "You're already ahead of everyone on the couch.",
+  "Start strong — finish stronger!",
+  "You showed up. That’s step one.",
+  "Fueling the fire — keep moving.",
+  "Let’s set the tone right now.",
+  "You’re building consistency. That’s powerful.",
+  "You've started — now let’s roll!",
+  "Push through the hesitation.",
+  "You’ve already started. That’s enough to keep going."
 ];
 
-const lateMessages = [
-    "Almost there! 🔥",
-    "Finish strong! 💯",
-    "Your future self is cheering!",
-    "Just one more rep!",
-    "You beast! 🐅"
+const motivationMid = [ /* 33–66% */
+  "You’re in the zone now. Stay there.",
+  "This is where most people quit — not you.",
+  "Push. Breathe. Repeat.",
+  "Each rep is a step toward stronger you.",
+  "No one else can do this for you.",
+  "You’re not tired, you’re transforming.",
+  "This is your turning point.",
+  "You’re halfway to proud.",
+  "Dig deep. Show up for yourself.",
+  "Power comes from persistence."
+];
+
+const motivationFinal = [ /* >66% */
+  "You’re almost there — don’t slow down now!",
+  "Last stretch — leave it all out here!",
+  "You vs. you — and you’re winning!",
+  "Champions are built in the final reps.",
+  "Crush the finish — you deserve the pride.",
+  "You’ve come this far. Now dominate!",
+  "Finish strong. Future you is watching.",
+  "Every second counts — let’s go!",
+  "This is where growth lives.",
+  "You’re a machine. Bring it home!"
 ];
 
 
@@ -39,12 +62,21 @@ function beep() {
     oscillator.stop(ctx.currentTime + 0.2);
 }
 
-function showMotivation() {
-    
-    const msgPool = currentRep > reps / 2 ? lateMessages : earlyMessages;
-    const msg = msgPool[Math.floor(Math.random() * msgPool.length)];
 
-    document.getElementById("message").textContent = msg;
+function showMotivation() {
+  const progress = currentRep / reps;
+  let msgPool;
+
+  if (progress < 0.33) {
+    msgPool = motivationEarly;
+  } else if (progress < 0.66) {
+    msgPool = motivationMid;
+  } else {
+    msgPool = motivationFinal;
+  }
+
+  const msg = msgPool[Math.floor(Math.random() * msgPool.length)];
+  document.getElementById("status").textContent = `⏱️ Rep ${currentRep+1}/${reps}: ` + msg;
 }
 
 function updateProgress() {
@@ -60,6 +92,25 @@ function updateProgress() {
 function startTimer() {
     if (timer || prepTimer) return;
 
+    // Hide input box
+    document.getElementById("input-box").style.display = "none";
+
+    // Show the gif container
+    document.getElementById("motivationGif").style.display = "block";
+    
+    // Prime clapping sound on first interaction
+    const clapSound = document.getElementById("clapSound");
+    if (clapSound.paused && clapSound.currentTime === 0) {
+        clapSound.volume = 0;
+        clapSound.play().then(() => {
+            clapSound.pause();
+            clapSound.currentTime = 0;
+            clapSound.volume = 1;
+        }).catch(err => {
+            console.warn("Clap sound priming failed:", err);
+        });
+    }
+
     const time = parseFloat(document.getElementById("time").value);
     reps = parseInt(document.getElementById("reps").value);
     if (time <= 0 || reps <= 0) {
@@ -73,6 +124,7 @@ function startTimer() {
     prepCountdown = 5;
     updateProgress();
 
+    
     document.getElementById("status").textContent = `⏳ Starting in 5...`;
 
     prepTimer = setInterval(() => {
@@ -111,7 +163,7 @@ function startReps() {
     } else {
         beep();
         showMotivation();
-        document.getElementById("status").textContent = `⏱️ Rep ${currentRep+1} of ${reps}`;
+        // document.getElementById("status").textContent = `⏱️ Rep ${currentRep+1} of ${reps}`;
         updateProgress();
     }
     }, interval * 1000);
@@ -138,6 +190,8 @@ function resetTimer() {
     document.getElementById("status").textContent = "🔁 Ready.";
     document.getElementById("message").textContent = "";
     document.getElementById("motivationGif").src = readyGif;
+    document.getElementById("input-box").style.display = "block";
+    document.getElementById("motivationGif").style.display = "none";
 }
 
 resetTimer();

@@ -10,7 +10,7 @@
 </head>
 <body>
   <h1>Rep Timer</h1>
-  <div class="input-box">
+  <div class="input-box" id="input-box">
     <div class="input-group">
       <label for="time">Time (minutes):</label>
       <input type="number" id="time" value="1" min="1" />
@@ -20,13 +20,18 @@
       <label for="reps">Reps:</label>
       <input type="number" id="reps" value="10" min="1" />
     </div>
+  </div>
+  
+  <img id="motivationGif" src="" alt="motivation" style="display: none;"/>
 
+  <div class="input-box" id="input-buttons">
     <div class="buttons">
-      <button class="start-btn" onclick="startTimer()">Start</button>
-      <button class="pause-btn" onclick="pauseTimer()">Pause</button>
-      <button class="reset-btn" onclick="resetTimer()">Reset</button>
+      <button class="start-btn" onclick="startTimer()">▶︎</button>
+      <button class="pause-btn" onclick="pauseTimer()">‖</button>
+      <button class="reset-btn" onclick="resetTimer()">↻</button>
     </div>
   </div>
+  
 
   <p id="status"></p>
 
@@ -35,7 +40,6 @@
   </div>
 
   <div id="message"></div>
-  <img id="motivationGif" src="" alt="motivation" />
 
   <!-- Sounds -->
   <audio id="clapSound" src="timersounds/clapping.mp3" preload="auto"></audio>
