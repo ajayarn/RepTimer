@@ -72,7 +72,7 @@ pause-btn:hover { background-color: #cf711a; }
 
 #status {
     margin-top: 20px;
-    font-size: clamp(18px, 5vw, 30px);
+    font-size: clamp(18px, 8vw, 30px);
     font-weight: bold;
     color: #f0f0f0;
     text-align: center;
