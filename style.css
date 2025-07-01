@@ -176,6 +176,7 @@ h1, #message {
 
     #motivationGif {
         max-width: 80vw;
+        /* max-height: 10vw; */
     }
 }
 

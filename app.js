@@ -142,7 +142,7 @@ function startTimer() {
         prepTimer = null;
         beep(); // signal start
         document.getElementById("status").textContent = `${currentRep+1} `;
-        document.getElementById("rep-count").textContent = `of ${reps} REPS`;
+        document.getElementById("rep-count").textContent = `of ${reps}`;
         document.getElementById("motivationGif").src = runningGif;
         startReps();
     } else {
@@ -188,6 +188,7 @@ function pauseTimer() {
     : `${currentRep+1}`;
 
     document.getElementById("pause-btn").textContent = paused ? "Continue" : "Pause"
+    document.getElementById("rep-count").textContent = paused ? `${currentRep + 1} of ${reps}` : `of ${reps}`
 }
 
 function resetTimer() {
