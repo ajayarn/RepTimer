@@ -192,7 +192,7 @@ function resetTimer() {
     currentRep = 0;
     prepCountdown = 5;
     updateProgress();
-    document.getElementById("status").textContent = "🔁 Ready";
+    document.getElementById("status").textContent = "Ready";
     document.getElementById("message").textContent = "REP TIMER";
     document.getElementById("rep-count").textContent = ``;
     document.getElementById("motivationGif").src = readyGif;
