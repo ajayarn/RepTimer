@@ -25,17 +25,13 @@
   
   <img id="motivationGif" src="" alt="motivation" style="display: none;"/>
 
-  
-  <div class="buttons">
-    <button class="start-btn" onclick="startTimer()">▶︎</button>
-    <button class="pause-btn" onclick="pauseTimer()">‖</button>
-    <button class="reset-btn" onclick="resetTimer()">↻</button>
-  </div>
 
   
   <div class="input-box" id="status-msg">
     <div id="status"></div>
+    <div id="rep-count"></div>
   </div>
+
   <!--  -->
   
   
@@ -43,7 +39,12 @@
     <div id="progressBar" class="progress-bar"></div>
   </div>
 
-  
+    <div class="buttons">
+    <button class="start-btn" onclick="startTimer()">▶︎</button>
+    <button class="pause-btn" onclick="pauseTimer()">‖</button>
+    <button class="reset-btn" onclick="resetTimer()">↻</button>
+  </div>
+
 
   <!-- Sounds -->
   <audio id="clapSound" src="timersounds/clapping.mp3" preload="auto"></audio>

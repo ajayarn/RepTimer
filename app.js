@@ -76,7 +76,7 @@ function showMotivation() {
   }
 
   const msg = msgPool[Math.floor(Math.random() * msgPool.length)];
-  document.getElementById("status").textContent = `${currentRep+1} / ${reps}`;
+  document.getElementById("status").textContent = `${currentRep+1}`;
   document.getElementById("message").textContent = msg;
 }
 
@@ -135,8 +135,8 @@ function startTimer() {
         clearInterval(prepTimer);
         prepTimer = null;
         beep(); // signal start
-        document.getElementById("status").textContent = `${currentRep+1} / ${reps}`;
-        // document.getElementById("message").textContent = `Rep ${currentRep+1}!`;
+        document.getElementById("status").textContent = `${currentRep+1} `;
+        document.getElementById("rep-count").textContent = `of ${reps} REPS`;
         document.getElementById("motivationGif").src = runningGif;
         startReps();
     } else {
@@ -192,6 +192,7 @@ function resetTimer() {
     updateProgress();
     document.getElementById("status").textContent = "🔁 Ready";
     document.getElementById("message").textContent = "REP TIMER";
+    document.getElementById("rep-count").textContent = ``;
     document.getElementById("motivationGif").src = readyGif;
     document.getElementById("input-box").style.display = "block";
     document.getElementById("motivationGif").style.display = "none";
