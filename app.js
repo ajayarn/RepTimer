@@ -76,8 +76,8 @@ function showMotivation() {
   }
 
   const msg = msgPool[Math.floor(Math.random() * msgPool.length)];
-  document.getElementById("status").textContent = `⏱️ Rep ${currentRep+1} of ${reps}`;
-  document.getElementById("message").textContent = msg;
+  document.getElementById("status").textContent = `⏱️ ${currentRep+1} / ${reps}`;
+//   document.getElementById("message").textContent = msg;
 }
 
 function updateProgress() {
@@ -126,7 +126,7 @@ function startTimer() {
     updateProgress();
 
     
-    document.getElementById("status").textContent = `⏳ Starting in 5...`;
+    document.getElementById("status").textContent = `⏳ 5`;
     
 
     prepTimer = setInterval(() => {
@@ -135,13 +135,13 @@ function startTimer() {
         clearInterval(prepTimer);
         prepTimer = null;
         beep(); // signal start
-        document.getElementById("status").textContent = `💪 Let's go!`;
-        document.getElementById("message").textContent = `Rep ${currentRep+1}!`;
+        document.getElementById("status").textContent = `💪 ${currentRep+1} / ${reps}`;
+        // document.getElementById("message").textContent = `Rep ${currentRep+1}!`;
         document.getElementById("motivationGif").src = runningGif;
         startReps();
     } else {
         prepCountdown--;
-        document.getElementById("status").textContent = `⏳ Starting in ${prepCountdown}...`;
+        document.getElementById("status").textContent = `⏳ ${prepCountdown}`;
     }
     }, 1000);
 }
@@ -153,8 +153,8 @@ function startReps() {
         if (currentRep >= reps) {
         clearInterval(timer);
         timer = null;
-        document.getElementById("status").textContent = "🎉 Workout Complete!";
-        document.getElementById("message").textContent = `So proud of you!`;
+        document.getElementById("status").textContent = "🎉 Well Done!";
+        // document.getElementById("message").textContent = `So proud of you!`;
         document.getElementById("clapSound").play().catch(err => {
             console.warn("Clap sound blocked or failed:", err);
         });
@@ -178,7 +178,7 @@ function pauseTimer() {
     ? "⏸️ Paused"
     : prepTimer
     ? `⏳ Resuming countdown: ${prepCountdown}`
-    : `▶️ Resuming rep ${currentRep+1} of ${reps}`;
+    : `▶️ Resuming ${currentRep+1} of ${reps}`;
 }
 
 function resetTimer() {
@@ -191,7 +191,7 @@ function resetTimer() {
     prepCountdown = 5;
     updateProgress();
     document.getElementById("status").textContent = "🔁 Ready";
-    document.getElementById("message").textContent = "";
+    // document.getElementById("message").textContent = "";
     document.getElementById("motivationGif").src = readyGif;
     document.getElementById("input-box").style.display = "block";
     document.getElementById("motivationGif").style.display = "none";

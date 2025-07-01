@@ -72,7 +72,7 @@ h1 {
 
 #status {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(24px, 12vw, 48px);
+  font-size: clamp(60px, 50vw, 80px);
   font-weight: bold;
   color: #f0f0f0;
   text-align: center;
