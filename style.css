@@ -1,5 +1,5 @@
 body {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Oswald', sans-serif;
     background: #121212;
     color: #f0f0f0;
     display: flex;
@@ -77,6 +77,7 @@ h1, #message {
     border-radius: 6px;
     cursor: pointer;
     color: white;
+    font-family: 'Oswald', sans-serif;
 }
 
 .start-btn { background-color: #27ae60; }
