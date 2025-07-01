@@ -21,11 +21,11 @@ body {
 
 h1, #message {
     font-family: 'Bebas Neue', sans-serif;
-    letter-spacing: 2px;
     font-size: clamp(20px, 8vw, 40px);
     color: #f0f0f0;
     text-align: center;
     min-height: 2em;
+    max-height: 2em;
     
     /* font-size: clamp(18px, 5vw, 30px);
     font-weight: 500;
