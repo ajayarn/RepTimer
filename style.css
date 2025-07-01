@@ -52,6 +52,7 @@ h1, #message {
     color: #fff;
     border: 1px solid #555;
     border-radius: 4px;
+    font-family: 'Oswald', sans-serif;
 }
 
 .buttons {
