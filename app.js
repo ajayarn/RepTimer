@@ -9,19 +9,16 @@ let prepTimer = null;
 const motivationEarly = [ /* <33% */ 
   "Every great session starts with one rep.",
   "You're already ahead of everyone on the couch.",
-  "Start strong — finish stronger!",
+  "Start strong!",
   "You showed up. That’s step one.",
-  "Fueling the fire — keep moving.",
+  "Keep moving.",
   "Let’s set the tone right now.",
-  "You’re building consistency. That’s powerful.",
+  "Consistency. That’s powerful.",
   "You've started — now let’s roll!",
-  "Push through the hesitation.",
-  "You’ve already started. That’s enough to keep going."
 ];
 
 const motivationMid = [ /* 33–66% */
   "You’re in the zone now. Stay there.",
-  "This is where most people quit — not you.",
   "Push. Breathe. Repeat.",
   "Each rep is a step toward stronger you.",
   "No one else can do this for you.",
@@ -35,7 +32,6 @@ const motivationMid = [ /* 33–66% */
 const motivationFinal = [ /* >66% */
   "You’re almost there — don’t slow down now!",
   "Last stretch — leave it all out here!",
-  "You vs. you — and you’re winning!",
   "Champions are built in the final reps.",
   "Crush the finish — you deserve the pride.",
   "You’ve come this far. Now dominate!",
@@ -77,7 +73,13 @@ function showMotivation() {
 
   const msg = msgPool[Math.floor(Math.random() * msgPool.length)];
   document.getElementById("status").textContent = `${currentRep+1}`;
-  document.getElementById("message").textContent = msg;
+
+  const msgEl = document.getElementById("message");
+  msgEl.style.opacity = 0;
+  setTimeout(() => {
+    msgEl.textContent = msg;
+    msgEl.style.opacity = 1;
+  }, 400); // Small delay to apply fade-out before content change
 }
 
 function updateProgress() {
@@ -175,10 +177,10 @@ function startReps() {
 function pauseTimer() {
     paused = !paused;
     document.getElementById("status").textContent = paused
-    ? "⏸️ Paused"
+    ? "⏸️"
     : prepTimer
-    ? `⏳ Resuming countdown: ${prepCountdown}`
-    : `▶️ Resuming ${currentRep+1} of ${reps}`;
+    ? `⏳ ${prepCountdown}`
+    : `${currentRep+1}`;
 }
 
 function resetTimer() {

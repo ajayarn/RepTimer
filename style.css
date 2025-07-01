@@ -31,7 +31,8 @@ h1, #message {
     font-weight: 500;
     color: #fff; */
     max-width: 90%;
-    animation: fadeIn 0.3s ease-in-out;
+    opacity: 1;
+    transition: opacity 0.4s ease;
 }
 
 .input-group {
