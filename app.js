@@ -155,8 +155,9 @@ function startReps() {
         if (currentRep >= reps) {
         clearInterval(timer);
         timer = null;
-        document.getElementById("status").textContent = "🎉 Well Done!";
+        document.getElementById("status").textContent = "Well Done!";
         document.getElementById("message").textContent = `Proud of you!`;
+        document.getElementById("rep-count").textContent = `You did ${reps} reps`;
         document.getElementById("clapSound").play().catch(err => {
             console.warn("Clap sound blocked or failed:", err);
         });
