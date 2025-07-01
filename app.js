@@ -93,6 +93,10 @@ function updateProgress() {
 }
 
 function startTimer() {
+    document.getElementById("start-btn").style.display = "none";
+    document.getElementById("pause-btn").style.display = "block";
+    document.getElementById("reset-btn").style.display = "block";
+
     if (timer || prepTimer) return;
 
     // Hide input box
@@ -152,7 +156,7 @@ function startReps() {
     timer = setInterval(() => {
     if (paused) return;
     currentRep++;
-        if (currentRep >= reps) {
+    if (currentRep >= reps) {
         clearInterval(timer);
         timer = null;
         document.getElementById("status").textContent = "Well Done!";
@@ -182,6 +186,8 @@ function pauseTimer() {
     : prepTimer
     ? `⏳ ${prepCountdown}`
     : `${currentRep+1}`;
+
+    document.getElementById("pause-btn").textContent = paused ? "Continue" : "Pause"
 }
 
 function resetTimer() {
@@ -199,6 +205,10 @@ function resetTimer() {
     document.getElementById("motivationGif").src = readyGif;
     document.getElementById("input-box").style.display = "block";
     document.getElementById("motivationGif").style.display = "none";
+    document.getElementById("start-btn").style.display = "block";
+    document.getElementById("pause-btn").style.display = "none";
+    document.getElementById("reset-btn").style.display = "none";
+
 }
 
 resetTimer();
