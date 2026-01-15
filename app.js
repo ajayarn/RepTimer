@@ -5,6 +5,7 @@ let currentRep = 0;
 let paused = false;
 let prepCountdown = 5;
 let prepTimer = null;
+let countdownInterval = null;
 
 const motivationEarly = [ /* <33% */ 
   "Every great session starts with one rep.",
@@ -42,11 +43,7 @@ const motivationFinal = [ /* >66% */
 ];
 
 
-const readyGif = "timergifs/ready.gif";
 
-const runningGif = "timergifs/running.gif";
-
-const clappingGif = "timergifs/clapping.gif";
 
 function beep() {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -102,8 +99,8 @@ function startTimer() {
     // Hide input box
     document.getElementById("input-box").style.display = "none";
 
-    // Show the gif container
-    document.getElementById("motivationGif").style.display = "block";
+    // Show the timer container
+    document.getElementById("big-timer").style.display = "block";
     
     // Prime clapping sound on first interaction
     const clapSound = document.getElementById("clapSound");
@@ -128,12 +125,8 @@ function startTimer() {
     interval = (time * 60) / reps;
     currentRep = 0;
     paused = false;
-    prepCountdown = 5;
+    prepCountdown = 10;
     updateProgress();
-
-    
-    document.getElementById("status").textContent = `⏳ 5`;
-    
 
     prepTimer = setInterval(() => {
     if (paused) return;
@@ -143,7 +136,7 @@ function startTimer() {
         beep(); // signal start
         document.getElementById("status").textContent = `${currentRep+1} `;
         document.getElementById("rep-count").textContent = `of ${reps}`;
-        document.getElementById("motivationGif").src = runningGif;
+        document.getElementById("big-timer").textContent = "GO!";
         startReps();
     } else {
         prepCountdown--;
@@ -153,30 +146,58 @@ function startTimer() {
 }
 
 function startReps() {
+    // Initial Countdown for first rep
+    startCountdown(interval);
+
     timer = setInterval(() => {
-    if (paused) return;
-    currentRep++;
-    if (currentRep >= reps) {
-        clearInterval(timer);
-        timer = null;
-        document.getElementById("status").textContent = "Well Done!";
-        document.getElementById("message").textContent = `Proud of you!`;
-        document.getElementById("rep-count").textContent = `You did ${reps} reps`;
-        document.getElementById("clapSound").play().catch(err => {
-            console.warn("Clap sound blocked or failed:", err);
-        });
-        document.getElementById("motivationGif").src = clappingGif;
-        beep();
-        updateProgress();
-        setTimeout(() => {
-        launchConfetti();
-        }, 1000);
-    } else {
-        beep();
-        showMotivation();
-        updateProgress();
-    }
+      if (paused) return;
+      currentRep++;
+      if (currentRep >= reps) {
+          clearInterval(timer);
+          clearInterval(countdownInterval);
+          timer = null;
+          document.getElementById("status").textContent = "Well Done!";
+          document.getElementById("message").textContent = `Proud of you!`;
+          document.getElementById("rep-count").textContent = `You did ${reps} reps`;
+          document.getElementById("clapSound").play().catch(err => {
+              console.warn("Clap sound blocked or failed:", err);
+          });
+          document.getElementById("big-timer").textContent = "DONE";
+          beep();
+          updateProgress();
+          setTimeout(() => {
+          launchConfetti();
+          }, 1000);
+          return
+      } 
+      
+      beep();
+      showMotivation();
+      updateProgress();
+
+      // Start countdown for next rep
+      startCountdown(interval);
+
     }, interval * 1000);
+}
+
+function startCountdown(duration) {
+    let secondsLeft = Math.ceil(duration);
+    document.getElementById("big-timer").textContent = secondsLeft;
+    
+    // Clear existing to prevent overlap
+    if(countdownInterval) clearInterval(countdownInterval);
+
+    countdownInterval = setInterval(() => {
+        if(paused) return;
+        secondsLeft--;
+        if (secondsLeft >= 0) {
+           document.getElementById("big-timer").textContent = secondsLeft;
+        } else {
+           // Interval finished, main timer will trigger
+           clearInterval(countdownInterval);
+        }
+    }, 1000);
 }
 
 function pauseTimer() {
@@ -194,8 +215,10 @@ function pauseTimer() {
 function resetTimer() {
     clearInterval(timer);
     clearInterval(prepTimer);
+    clearInterval(countdownInterval);
     timer = null;
     prepTimer = null;
+    countdownInterval = null;
     paused = false;
     currentRep = 0;
     prepCountdown = 5;
@@ -203,9 +226,9 @@ function resetTimer() {
     document.getElementById("status").textContent = "Ready";
     document.getElementById("message").textContent = "REP TIMER";
     document.getElementById("rep-count").textContent = ``;
-    document.getElementById("motivationGif").src = readyGif;
+    document.getElementById("big-timer").textContent = "Ready";
     document.getElementById("input-box").style.display = "block";
-    document.getElementById("motivationGif").style.display = "none";
+    document.getElementById("big-timer").style.display = "none";
     document.getElementById("start-btn").style.display = "block";
     document.getElementById("pause-btn").style.display = "none";
     document.getElementById("reset-btn").style.display = "none";

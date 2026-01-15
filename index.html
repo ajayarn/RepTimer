@@ -1,6 +1,6 @@
-
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,18 +8,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <!-- <h1>Rep Timer</h1> -->
   <div id="message"></div>
   <div class="input-box" id="input-box">
     <div class="input-group">
       <label for="time">Mins:</label>
-      <input type="number" placeholder="mins" id="time" value="20" min="1"/>
+      <input type="number" placeholder="mins" id="time" value="20" min="1" />
     </div>
 
     <div class="input-group">
       <label for="reps">Reps:</label>
-      <input type="number" placeholder="reps" id="reps" value="40" min="1"/>
+      <input type="number" placeholder="reps" id="reps" value="40" min="1" />
     </div>
   </div>
 
@@ -28,24 +29,28 @@
     <button class="pause-btn" id="pause-btn" onclick="pauseTimer()" style="display: none;">Pause</button>
     <button class="reset-btn" id="reset-btn" onclick="resetTimer()" style="display: none;">Reset</button>
   </div>
-  
-  <img id="motivationGif" src="" alt="motivation" style="display: none;"/>
+
+  <div id="big-timer" style="display: none; font-size: 5rem; font-weight: bold; text-align: center; margin: 20px 0;">
+    00:00</div>
 
 
-  
+
   <div class="input-box" id="status-msg">
     <div id="status"></div>
-    <div id="rep-count"></div>
+    <div class="rep-info">
+      <div id="rep-count"></div>
+      <div id="rep-timer"></div>
+    </div>
   </div>
 
   <!--  -->
-  
-  
+
+
   <div class="progress-container">
     <div id="progressBar" class="progress-bar"></div>
   </div>
 
-    
+
 
 
   <!-- Sounds -->
@@ -55,4 +60,5 @@
 
   <div id="confetti-container"></div>
 </body>
+
 </html>
