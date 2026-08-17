@@ -1,64 +1,176 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Rep Timer</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <main aria-label="Rep Timer app">
+            <h1 class="visually-hidden">Rep Timer</h1>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rep Timer</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-</head>
+            <div
+                id="message"
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+            >
+                REP TIMER
+            </div>
 
-<body>
-  <!-- <h1>Rep Timer</h1> -->
-  <div id="message"></div>
-  <div class="input-box" id="input-box">
-    <div class="input-group">
-      <label for="time">Mins:</label>
-      <input type="number" placeholder="mins" id="time" value="20" min="1" />
-    </div>
+            <div class="workout-type-selector" role="group" aria-label="Workout type">
+                <button
+                    class="wt-btn"
+                    id="wt-6count"
+                    type="button"
+                    onclick="selectWorkoutType('6count')"
+                    aria-pressed="false"
+                >
+                    6-Count
+                </button>
+                <button
+                    class="wt-btn"
+                    id="wt-navyseals"
+                    type="button"
+                    onclick="selectWorkoutType('navyseals')"
+                    aria-pressed="false"
+                >
+                    Navy Seals
+                </button>
+            </div>
 
-    <div class="input-group">
-      <label for="reps">Reps:</label>
-      <input type="number" placeholder="reps" id="reps" value="40" min="1" />
-    </div>
-  </div>
+            <section
+                class="input-box"
+                id="input-box"
+                aria-label="Workout settings"
+            >
+                <div class="input-group">
+                    <label for="time">Minutes:</label>
+                    <input
+                        type="number"
+                        id="time"
+                        name="time"
+                        placeholder="mins"
+                        value="20"
+                        min="1"
+                        step="0.1"
+                        inputmode="decimal"
+                        required
+                    />
+                </div>
 
-  <div class="buttons">
-    <button class="start-btn" id="start-btn" onclick="startTimer()">Start</button>
-    <button class="pause-btn" id="pause-btn" onclick="pauseTimer()" style="display: none;">Pause</button>
-    <button class="reset-btn" id="reset-btn" onclick="resetTimer()" style="display: none;">Reset</button>
-  </div>
+                <div class="input-group">
+                    <label for="reps">Reps:</label>
+                    <input
+                        type="number"
+                        id="reps"
+                        name="reps"
+                        placeholder="reps"
+                        value="40"
+                        min="1"
+                        step="1"
+                        inputmode="numeric"
+                        required
+                    />
+                </div>
+            </section>
 
-  <div id="big-timer" style="display: none; font-size: 5rem; font-weight: bold; text-align: center; margin: 20px 0;">
-    00:00</div>
+            <div class="buttons" role="group" aria-label="Timer controls">
+                <button class="start-btn" id="start-btn" type="button">
+                    Start
+                </button>
+                <button class="pause-btn" id="pause-btn" type="button" hidden>
+                    Pause
+                </button>
+                <button class="reset-btn" id="reset-btn" type="button" hidden>
+                    Reset
+                </button>
+            </div>
 
+            <div id="big-timer" hidden aria-live="polite" aria-atomic="true">
+                00:00
+            </div>
 
+            <section
+                class="input-box"
+                id="status-msg"
+                aria-label="Progress status"
+            >
+                <div id="workout-type-badge" class="workout-type-badge" hidden></div>
+                <div
+                    id="status"
+                    role="status"
+                    aria-live="polite"
+                    aria-atomic="true"
+                >
+                    Ready
+                </div>
+                <div class="rep-info">
+                    <div id="rep-count" aria-live="polite"></div>
+                    <div id="rep-timer" aria-live="polite"></div>
+                </div>
+            </section>
 
-  <div class="input-box" id="status-msg">
-    <div id="status"></div>
-    <div class="rep-info">
-      <div id="rep-count"></div>
-      <div id="rep-timer"></div>
-    </div>
-  </div>
+            <div class="progress-container" aria-label="Workout progress">
+                <div
+                    id="progressBar"
+                    class="progress-bar"
+                    role="progressbar"
+                    aria-label="Rep completion"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    aria-valuenow="0"
+                ></div>
+            </div>
 
-  <!--  -->
+            <button
+                class="history-toggle-btn"
+                id="history-toggle-btn"
+                type="button"
+                onclick="toggleHistory()"
+                aria-expanded="false"
+                aria-controls="history-panel"
+            >
+                &#9658; History
+            </button>
 
+            <section
+                id="history-panel"
+                class="history-panel"
+                aria-label="Workout history"
+                hidden
+            >
+                <canvas id="history-chart" aria-label="Workout progress chart"></canvas>
+                <div id="history-log" class="history-log" aria-label="Recent workouts"></div>
+            </section>
+        </main>
 
-  <div class="progress-container">
-    <div id="progressBar" class="progress-bar"></div>
-  </div>
+        <audio
+            id="clapSound"
+            src="timersounds/clapping.mp3"
+            preload="auto"
+        ></audio>
+        <div id="confetti-container" aria-hidden="true"></div>
 
+        <noscript>This app requires JavaScript to run the timer.</noscript>
 
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+        <script src="app.js"></script>
+        <script>
+            (function () {
+                const startBtn = document.getElementById("start-btn");
+                const pauseBtn = document.getElementById("pause-btn");
+                const resetBtn = document.getElementById("reset-btn");
 
-
-  <!-- Sounds -->
-  <audio id="clapSound" src="timersounds/clapping.mp3" preload="auto"></audio>
-
-  <script src="app.js"></script>
-
-  <div id="confetti-container"></div>
-</body>
-
+                if (startBtn) startBtn.addEventListener("click", startTimer);
+                if (pauseBtn) pauseBtn.addEventListener("click", pauseTimer);
+                if (resetBtn) resetBtn.addEventListener("click", resetTimer);
+            })();
+        </script>
+    </body>
 </html>
