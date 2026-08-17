@@ -246,3 +246,37 @@ h1,
         font-size: clamp(28px, 10vw, 58px);
     }
 }
+
+/* ── Workout type selector ─────────────────────── */
+.workout-type-selector {
+    width: 90%;
+    max-width: 400px;
+    display: flex;
+    gap: 12px;
+    margin: 16px 0 8px;
+}
+
+.wt-btn {
+    flex: 1;
+    padding: 14px 10px;
+    border: 2px solid var(--muted-border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(18px, 5vw, 24px);
+    letter-spacing: 1px;
+    min-height: 54px;
+    transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.wt-btn.active {
+    border-color: var(--start);
+    background: var(--start);
+    color: #fff;
+}
+
+.wt-btn:hover:not(.active) {
+    border-color: var(--text);
+}

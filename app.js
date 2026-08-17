@@ -81,6 +81,9 @@ const el = {
   reps: document.getElementById("reps"),
   inputBox: document.getElementById("input-box"),
 
+  wt6Count:     document.getElementById('wt-6count'),
+  wtNavySeals:  document.getElementById('wt-navyseals'),
+
   startBtn: document.getElementById("start-btn"),
   pauseBtn: document.getElementById("pause-btn"),
   resetBtn: document.getElementById("reset-btn"),
@@ -139,6 +142,26 @@ function wireAccessibility() {
   if (el.time) el.time.setAttribute("inputmode", "decimal");
   if (el.reps) el.reps.setAttribute("inputmode", "numeric");
 }
+
+function selectWorkoutType(type) {
+  state.workoutType = type;
+
+  if (el.wt6Count) {
+    el.wt6Count.classList.toggle('active', type === '6count');
+    el.wt6Count.setAttribute('aria-pressed', String(type === '6count'));
+  }
+  if (el.wtNavySeals) {
+    el.wtNavySeals.classList.toggle('active', type === 'navyseals');
+    el.wtNavySeals.setAttribute('aria-pressed', String(type === 'navyseals'));
+  }
+
+  const last = getLastEntryForType(type);
+  if (last) {
+    el.reps.value = last.reps;
+  }
+}
+
+window.selectWorkoutType = selectWorkoutType;
 
 function getAudioContext() {
   if (state.audioContext) {
@@ -390,6 +413,10 @@ function finishWorkout(runId) {
 }
 
 function validateInputs() {
+  if (!state.workoutType) {
+    return { ok: false, message: 'Select a workout type (6-Count or Navy Seals) before starting.' };
+  }
+
   const time = Number(el.time.value);
   const nextReps = Number(el.reps.value);
 
