@@ -103,6 +103,8 @@ const el = {
   historyPanel:       document.getElementById('history-panel'),
   historyChartCanvas: document.getElementById('history-chart'),
   historyLog:         document.getElementById('history-log'),
+
+  workoutTypeBadge: document.getElementById('workout-type-badge'),
 };
 
 const state = {
@@ -393,6 +395,17 @@ function clearAllDelayedUi() {
   }
 }
 
+function setWorkoutTypeBadge(type) {
+  if (!el.workoutTypeBadge) return;
+  if (!type) {
+    el.workoutTypeBadge.setAttribute('hidden', '');
+    return;
+  }
+  el.workoutTypeBadge.removeAttribute('hidden');
+  el.workoutTypeBadge.textContent = type === '6count' ? '6-COUNT' : 'NAVY SEALS';
+  el.workoutTypeBadge.className = `workout-type-badge workout-type-badge--${type}`;
+}
+
 function setButtonState(mode) {
   if (mode === "idle") {
     el.startBtn.style.display = "block";
@@ -604,6 +617,7 @@ function startTimer() {
   state.paused = false;
 
   el.inputBox.style.display = "none";
+  setWorkoutTypeBadge(state.workoutType);
   el.bigTimer.style.display = "block";
 
   setMessage("REP TIMER");
@@ -671,6 +685,7 @@ function resetTimer() {
   el.bigTimer.textContent = "Ready";
 
   el.inputBox.style.display = "block";
+  setWorkoutTypeBadge(null);
   el.bigTimer.style.display = "none";
 
   setButtonState("idle");
