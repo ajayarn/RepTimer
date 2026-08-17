@@ -39,7 +39,6 @@ main {
 #setup-screen {
   display: flex;
   flex-direction: column;
-  align-items: center;
   padding: 24px 16px 32px;
   gap: 16px;
   width: 100%;
@@ -149,6 +148,21 @@ h1 {
   letter-spacing: 2px;
   color: var(--muted);
   min-height: 18px;
+}
+
+/* Inline validation error */
+.validation-error {
+  min-height: 0;
+  font-size: 13px;
+  color: #e74c3c;
+  text-align: center;
+  letter-spacing: 1px;
+  padding: 0;
+  transition: padding 0.15s;
+}
+
+.validation-error:not(:empty) {
+  padding: 8px 0;
 }
 
 /* Start button */

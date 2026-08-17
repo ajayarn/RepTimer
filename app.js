@@ -108,7 +108,8 @@ const el = {
   workoutTimer:  document.getElementById('workout-timer'),
   dotGrid:       document.getElementById('dot-grid'),
   repPaceHint:   document.getElementById('rep-pace-hint'),
-  topPanelLabel: document.getElementById('top-panel-label'),
+  topPanelLabel:    document.getElementById('top-panel-label'),
+  validationError:  document.getElementById('validation-error'),
 };
 
 const state = {
@@ -166,6 +167,8 @@ function selectWorkoutType(type) {
     el.wtNavySeals.classList.toggle('active', type === 'navyseals');
     el.wtNavySeals.setAttribute('aria-pressed', String(type === 'navyseals'));
   }
+
+  if (el.validationError) el.validationError.textContent = '';
 
   const last = getLastEntryForType(type);
   if (last) {
@@ -640,9 +643,10 @@ function startTimer() {
 
   const validation = validateInputs();
   if (!validation.ok) {
-    alert(validation.message);
+    if (el.validationError) el.validationError.textContent = validation.message;
     return;
   }
+  if (el.validationError) el.validationError.textContent = '';
 
   state.runId += 1;
   const runId = state.runId;
