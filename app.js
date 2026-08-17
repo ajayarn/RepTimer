@@ -92,20 +92,23 @@ const el = {
   status: document.getElementById("status"),
   message: document.getElementById("message"),
   repCount: document.getElementById("rep-count"),
-  repTimer: document.getElementById("rep-timer"),
   bigTimer: document.getElementById("big-timer"),
 
-  progressBar: document.getElementById("progressBar"),
   confettiContainer: document.getElementById("confetti-container"),
 
   clapSound: document.getElementById("clapSound"),
 
-  historyToggleBtn:   document.getElementById('history-toggle-btn'),
   historyPanel:       document.getElementById('history-panel'),
   historyChartCanvas: document.getElementById('history-chart'),
   historyLog:         document.getElementById('history-log'),
 
   workoutTypeBadge: document.getElementById('workout-type-badge'),
+
+  setupScreen:  document.getElementById('setup-screen'),
+  activeScreen: document.getElementById('active-screen'),
+  workoutTimer: document.getElementById('workout-timer'),
+  dotGrid:      document.getElementById('dot-grid'),
+  repPaceHint:  document.getElementById('rep-pace-hint'),
 };
 
 const state = {
@@ -128,6 +131,7 @@ const state = {
 
   workoutType: null,    // '6count' | 'navyseals' | null
   chartInstance: null,  // Chart.js instance reference for destroy/recreate
+  totalWorkoutMs: 0,
 };
 
 function wireAccessibility() {
@@ -265,22 +269,6 @@ function renderHistory() {
   renderHistoryLog(log);
 }
 
-function toggleHistory() {
-  if (!el.historyPanel || !el.historyToggleBtn) return;
-  const isHidden = el.historyPanel.hasAttribute('hidden');
-  if (isHidden) {
-    el.historyPanel.removeAttribute('hidden');
-    el.historyToggleBtn.textContent = '▾ History';
-    el.historyToggleBtn.setAttribute('aria-expanded', 'true');
-    renderHistory();
-  } else {
-    el.historyPanel.setAttribute('hidden', '');
-    el.historyToggleBtn.textContent = '▸ History';
-    el.historyToggleBtn.setAttribute('aria-expanded', 'false');
-  }
-}
-
-window.toggleHistory = toggleHistory;
 
 function getAudioContext() {
   if (state.audioContext) {
@@ -330,18 +318,39 @@ function formatClock(totalMs) {
 }
 
 function updateProgress() {
-  const rawPercent = state.reps > 0 ? (state.currentRep / state.reps) * 100 : 0;
-  const percent = Math.max(0, Math.min(100, rawPercent));
+  updateDotGrid(state.currentRep);
+}
 
-  el.progressBar.style.width = `${percent}%`;
-  el.progressBar.setAttribute('aria-valuenow', String(Math.round(percent)));
+function buildDotGrid(reps) {
+  if (!el.dotGrid) return;
+  el.dotGrid.innerHTML = '';
+  for (let i = 0; i < reps; i++) {
+    const dot = document.createElement('span');
+    dot.className = 'dot';
+    el.dotGrid.appendChild(dot);
+  }
+  el.dotGrid.setAttribute('aria-valuemax', String(reps));
+  el.dotGrid.setAttribute('aria-valuenow', '0');
+}
 
-  if (percent < 33) {
-    el.progressBar.style.backgroundColor = "green";
-  } else if (percent < 66) {
-    el.progressBar.style.backgroundColor = "orange";
+function updateDotGrid(completedReps) {
+  if (!el.dotGrid) return;
+  const dots = el.dotGrid.querySelectorAll('.dot');
+  dots.forEach((dot, i) => {
+    dot.classList.toggle('dot--done', i < completedReps);
+  });
+  el.dotGrid.setAttribute('aria-valuenow', String(completedReps));
+}
+
+function updateRepPaceHint() {
+  if (!el.repPaceHint) return;
+  const time = Number(el.time.value);
+  const reps = Number(el.reps.value);
+  if (time > 0 && reps > 0 && Number.isFinite(time) && Number.isInteger(reps)) {
+    const secsPerRep = Math.round((time * 60) / reps);
+    el.repPaceHint.textContent = `~${secsPerRep} sec per rep`;
   } else {
-    el.progressBar.style.backgroundColor = "red";
+    el.repPaceHint.textContent = '';
   }
 }
 
@@ -417,6 +426,7 @@ function setButtonState(mode) {
     el.startBtn.style.display = "block";
     el.pauseBtn.style.display = "none";
     el.resetBtn.style.display = "none";
+    el.resetBtn.textContent = 'RESET';
     el.pauseBtn.textContent = "Pause";
     return;
   }
@@ -433,33 +443,44 @@ function setButtonState(mode) {
     el.startBtn.style.display = "none";
     el.pauseBtn.style.display = "none";
     el.resetBtn.style.display = "block";
+    el.resetBtn.textContent = 'NEW WORKOUT';
     el.pauseBtn.textContent = "Pause";
+    return;
   }
 }
 
 function renderActivePhase() {
-  if (state.currentPhase === "idle" || state.currentPhase === "finished")
-    return;
+  if (state.currentPhase === 'idle' || state.currentPhase === 'finished') return;
 
   const remainingMs = state.paused
     ? state.phaseRemainingMs
     : Math.max(0, state.phaseEndsAt - Date.now());
 
-  const remainingSeconds = Math.max(0, Math.ceil(remainingMs / 1000));
-
-  if (state.currentPhase === "prep") {
-    el.status.textContent = state.paused ? "⏸" : `⏳ ${remainingSeconds}`;
+  if (state.currentPhase === 'prep') {
+    el.status.textContent = state.paused ? '⏸ PAUSED' : 'GET READY IN';
     el.bigTimer.textContent = formatClock(remainingMs);
+    el.bigTimer.className = 'prep';
+    if (el.workoutTimer) {
+      el.workoutTimer.textContent = formatClock(state.totalWorkoutMs);
+      el.workoutTimer.className = 'dimmed';
+    }
     el.repCount.textContent = `0 of ${state.reps}`;
-    el.repTimer.textContent = "Get ready";
     return;
   }
 
-  if (state.currentPhase === "rep") {
-    el.status.textContent = state.paused ? "⏸" : `${state.currentRep + 1}`;
+  if (state.currentPhase === 'rep') {
+    // Total remaining = remaining reps after this one × interval + current rep remaining
+    const repsAfterThis = state.reps - state.currentRep - 1;
+    const workoutRemainingMs = Math.max(0, repsAfterThis * state.intervalSeconds * 1000 + remainingMs);
+
+    el.status.textContent = state.paused ? '⏸ PAUSED' : 'NEXT REP IN';
     el.bigTimer.textContent = formatClock(remainingMs);
-    el.repCount.textContent = `${state.currentRep + 1} of ${state.reps}`;
-    el.repTimer.textContent = `Next rep in ${formatClock(remainingMs)}`;
+    el.bigTimer.className = '';
+    if (el.workoutTimer) {
+      el.workoutTimer.textContent = formatClock(workoutRemainingMs);
+      el.workoutTimer.className = '';
+    }
+    el.repCount.textContent = `Rep ${state.currentRep + 1} of ${state.reps}`;
   }
 }
 
@@ -535,13 +556,17 @@ function finishWorkout(runId) {
     });
   }
 
-  updateProgress();
-
-  el.status.textContent = "Well Done!";
-  setMessage("Proud of you!");
-  el.repCount.textContent = `You did ${state.reps} reps`;
-  el.repTimer.textContent = "";
-  el.bigTimer.textContent = "DONE";
+  el.status.textContent = 'WELL DONE';
+  if (el.workoutTimer) {
+    el.workoutTimer.textContent = 'DONE';
+    el.workoutTimer.className = '';
+  }
+  el.bigTimer.textContent = `${state.reps}`;
+  el.bigTimer.className = 'done';
+  const totalMinutes = parseFloat(((state.reps * state.intervalSeconds) / 60).toFixed(1));
+  el.repCount.textContent = `reps · ${totalMinutes} min`;
+  setMessage('Proud of you!');
+  updateDotGrid(state.reps); // fill all dots
 
   el.clapSound.play().catch((err) => {
     console.warn("Clap sound blocked or failed:", err);
@@ -555,7 +580,7 @@ function finishWorkout(runId) {
     launchConfetti(runId);
   }, 1000);
 
-  if (el.historyPanel && !el.historyPanel.hasAttribute('hidden')) renderHistory();
+  renderHistory();
 }
 
 function validateInputs() {
@@ -623,14 +648,16 @@ function startTimer() {
   state.currentPhase = "prep";
   state.phaseRemainingMs = PREP_SECONDS * 1000;
   state.paused = false;
+  state.totalWorkoutMs = state.reps * state.intervalSeconds * 1000;
 
-  el.inputBox.style.display = "none";
+  // Switch screens
+  if (el.setupScreen) el.setupScreen.hidden = true;
+  if (el.activeScreen) el.activeScreen.hidden = false;
+
+  // Build dot grid
+  buildDotGrid(state.reps);
+
   setWorkoutTypeBadge(state.workoutType);
-  el.bigTimer.style.display = "block";
-
-  setMessage("REP TIMER");
-  el.repCount.textContent = `0 of ${state.reps}`;
-  el.repTimer.textContent = "Get ready";
 
   primeClapAudio();
   updateProgress();
@@ -686,15 +713,25 @@ function resetTimer() {
 
   updateProgress();
 
+  // Switch back to setup screen
+  if (el.activeScreen) el.activeScreen.hidden = true;
+  if (el.setupScreen) el.setupScreen.hidden = false;
+
+  // Clear dot grid
+  if (el.dotGrid) el.dotGrid.innerHTML = '';
+
+  // Restore workout-timer display
+  if (el.workoutTimer) {
+    el.workoutTimer.textContent = '—';
+    el.workoutTimer.className = 'dimmed';
+  }
+
   el.status.textContent = "Ready";
   setMessage("REP TIMER");
   el.repCount.textContent = "";
-  el.repTimer.textContent = "";
   el.bigTimer.textContent = "Ready";
 
-  el.inputBox.style.display = "block";
   setWorkoutTypeBadge(null);
-  el.bigTimer.style.display = "none";
 
   setButtonState("idle");
 }
@@ -735,3 +772,9 @@ window.resetTimer = resetTimer;
 
 wireAccessibility();
 resetTimer();
+
+if (el.time)  el.time.addEventListener('input', updateRepPaceHint);
+if (el.reps)  el.reps.addEventListener('input', updateRepPaceHint);
+updateRepPaceHint();
+
+renderHistory();
