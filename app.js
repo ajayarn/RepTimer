@@ -95,8 +95,6 @@ const el = {
 
   confettiContainer: document.getElementById("confetti-container"),
 
-  clapSound: document.getElementById("clapSound"),
-
   historyPanel:       document.getElementById('history-panel'),
   historyChartCanvas: document.getElementById('history-chart'),
   historyLog:         document.getElementById('history-log'),
@@ -312,6 +310,37 @@ function beep() {
 
   oscillator.start();
   oscillator.stop(ctx.currentTime + 0.2);
+}
+
+function playFinishTune() {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  // Ascending C-major arpeggio: C5 E5 G5 C6
+  const notes = [
+    { freq: 523.25, start: 0.0,  dur: 0.14 },
+    { freq: 659.25, start: 0.12, dur: 0.14 },
+    { freq: 784.0,  start: 0.24, dur: 0.14 },
+    { freq: 1046.5, start: 0.36, dur: 0.7  },
+  ];
+
+  notes.forEach(({ freq, start, dur }) => {
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(freq, ctx.currentTime + start);
+
+    gain.gain.setValueAtTime(0, ctx.currentTime + start);
+    gain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + start + 0.025);
+    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + start + dur);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(ctx.currentTime + start);
+    osc.stop(ctx.currentTime + start + dur + 0.05);
+  });
 }
 
 function formatClock(totalMs) {
@@ -576,11 +605,7 @@ function finishWorkout(runId) {
   setMessage('Proud of you!');
   updateDotGrid(state.reps); // fill all dots
 
-  el.clapSound.play().catch((err) => {
-    console.warn("Clap sound blocked or failed:", err);
-  });
-
-  beep();
+  playFinishTune();
   setButtonState("finished");
 
   setTimeout(() => {
@@ -619,23 +644,7 @@ function validateInputs() {
 }
 
 function primeClapAudio() {
-  getAudioContext();
-
-  // Prime only once per fresh media element state.
-  if (el.clapSound.paused && el.clapSound.currentTime === 0) {
-    el.clapSound.volume = 0;
-    el.clapSound
-      .play()
-      .then(() => {
-        el.clapSound.pause();
-        el.clapSound.currentTime = 0;
-        el.clapSound.volume = 1;
-      })
-      .catch((err) => {
-        // Not fatal; playback may still work later on user action.
-        console.warn("Clap sound priming failed:", err);
-      });
-  }
+  getAudioContext(); // warm up audio context on user interaction
 }
 
 function startTimer() {
@@ -662,6 +671,7 @@ function startTimer() {
   // Switch screens
   if (el.setupScreen) el.setupScreen.hidden = true;
   if (el.activeScreen) el.activeScreen.hidden = false;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 
   // Build dot grid
   buildDotGrid(state.reps);
@@ -709,16 +719,6 @@ function resetTimer() {
     el.confettiContainer.innerHTML = "";
   }
 
-  // Reset clap sound state if available.
-  if (el.clapSound) {
-    try {
-      el.clapSound.pause();
-      el.clapSound.currentTime = 0;
-      el.clapSound.volume = 1;
-    } catch (_) {
-      // no-op
-    }
-  }
 
   updateProgress();
 
