@@ -80,7 +80,6 @@ function getLastEntryForType(type) {
 const el = {
   time: document.getElementById("time"),
   reps: document.getElementById("reps"),
-  inputBox: document.getElementById("input-box"),
 
   wt6Count:     document.getElementById('wt-6count'),
   wtNavySeals:  document.getElementById('wt-navyseals'),
@@ -104,11 +103,12 @@ const el = {
 
   workoutTypeBadge: document.getElementById('workout-type-badge'),
 
-  setupScreen:  document.getElementById('setup-screen'),
-  activeScreen: document.getElementById('active-screen'),
-  workoutTimer: document.getElementById('workout-timer'),
-  dotGrid:      document.getElementById('dot-grid'),
-  repPaceHint:  document.getElementById('rep-pace-hint'),
+  setupScreen:   document.getElementById('setup-screen'),
+  activeScreen:  document.getElementById('active-screen'),
+  workoutTimer:  document.getElementById('workout-timer'),
+  dotGrid:       document.getElementById('dot-grid'),
+  repPaceHint:   document.getElementById('rep-pace-hint'),
+  topPanelLabel: document.getElementById('top-panel-label'),
 };
 
 const state = {
@@ -171,6 +171,7 @@ function selectWorkoutType(type) {
   if (last) {
     el.reps.value = last.reps;
   }
+  updateRepPaceHint();
 }
 
 window.selectWorkoutType = selectWorkoutType;
@@ -333,11 +334,12 @@ function buildDotGrid(reps) {
   el.dotGrid.setAttribute('aria-valuenow', '0');
 }
 
-function updateDotGrid(completedReps) {
+function updateDotGrid(completedReps, currentRep = -1) {
   if (!el.dotGrid) return;
   const dots = el.dotGrid.querySelectorAll('.dot');
   dots.forEach((dot, i) => {
     dot.classList.toggle('dot--done', i < completedReps);
+    dot.classList.toggle('dot--current', i === currentRep);
   });
   el.dotGrid.setAttribute('aria-valuenow', String(completedReps));
 }
@@ -473,7 +475,8 @@ function renderActivePhase() {
     const repsAfterThis = state.reps - state.currentRep - 1;
     const workoutRemainingMs = Math.max(0, repsAfterThis * state.intervalSeconds * 1000 + remainingMs);
 
-    el.status.textContent = state.paused ? '⏸ PAUSED' : 'NEXT REP IN';
+    const isLastRep = (state.currentRep === state.reps - 1);
+    el.status.textContent = state.paused ? '⏸ PAUSED' : (isLastRep ? 'LAST REP' : 'NEXT REP IN');
     el.bigTimer.textContent = formatClock(remainingMs);
     el.bigTimer.className = '';
     if (el.workoutTimer) {
@@ -481,6 +484,7 @@ function renderActivePhase() {
       el.workoutTimer.className = '';
     }
     el.repCount.textContent = `Rep ${state.currentRep + 1} of ${state.reps}`;
+    updateDotGrid(state.currentRep, state.currentRep);
   }
 }
 
@@ -561,6 +565,7 @@ function finishWorkout(runId) {
     el.workoutTimer.textContent = 'DONE';
     el.workoutTimer.className = '';
   }
+  if (el.topPanelLabel) el.topPanelLabel.textContent = 'WORKOUT';
   el.bigTimer.textContent = `${state.reps}`;
   el.bigTimer.className = 'done';
   const totalMinutes = parseFloat(((state.reps * state.intervalSeconds) / 60).toFixed(1));
@@ -716,6 +721,7 @@ function resetTimer() {
   // Switch back to setup screen
   if (el.activeScreen) el.activeScreen.hidden = true;
   if (el.setupScreen) el.setupScreen.hidden = false;
+  if (el.topPanelLabel) el.topPanelLabel.textContent = 'TOTAL REMAINING';
 
   // Clear dot grid
   if (el.dotGrid) el.dotGrid.innerHTML = '';

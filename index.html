@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <main>
+    <main aria-label="Rep Timer app">
 
       <!-- ── SETUP SCREEN ─────────────────────────── -->
       <div id="setup-screen">
@@ -57,7 +57,7 @@
 
         <!-- Top: total workout clock -->
         <div id="top-panel">
-          <div class="panel-label">TOTAL REMAINING</div>
+          <div class="panel-label" id="top-panel-label">TOTAL REMAINING</div>
           <div id="workout-timer" aria-live="polite" aria-atomic="true">20:00</div>
           <div id="workout-type-badge" class="workout-type-badge" hidden></div>
         </div>
