@@ -1,408 +1,429 @@
 :root {
-    --bg: #121212;
-    --surface: #1e1e1e;
-    --border: #333;
-    --text: #f0f0f0;
-    --muted-border: #555;
-
-    --start: #27ae60;
-    --start-hover: #219150;
-    --pause: #e67e22;
-    --pause-hover: #cf711a;
-    --reset: #c0392b;
-    --reset-hover: #a8322b;
-
-    --progress-bg: #444;
-    --shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  --bg: #0f0f0f;
+  --surface: #111111;
+  --surface-2: #161616;
+  --border: #1e1e1e;
+  --border-strong: #2a2a2a;
+  --text: #ffffff;
+  --muted: #555555;
+  --green: #27ae60;
+  --green-dim: rgba(39, 174, 96, 0.15);
+  --blue: #3498db;
+  --orange: #f39c12;
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
 }
 
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-}
+*, *::before, *::after { box-sizing: border-box; }
 
 body {
-    margin: 0;
-    padding: 16px 16px 48px;
-    font-family: "Oswald", sans-serif;
-    font-size: 18px;
-    color: var(--text);
-    background: var(--bg);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  margin: 0;
+  min-height: 100dvh;
+  font-family: 'Oswald', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* Headline / rotating motivation text */
-h1,
-#message {
-    margin: 0;
-    max-width: 90%;
-    min-height: 2em;
-    max-height: 2em;
-    text-align: center;
-    color: var(--text);
-    font-family: "Bebas Neue", sans-serif;
-    font-size: clamp(20px, 8vw, 40px);
-    opacity: 1;
-    transition: opacity 0.4s ease;
+main {
+  width: 100%;
+  max-width: 480px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Shared card shell */
-.input-box {
-    width: 90%;
-    max-width: 400px;
-    margin: 8px 0;
-    padding: 12px 16px;
-    border: 2px solid var(--border);
-    border-radius: 10px;
-    background: var(--surface);
-    box-shadow: var(--shadow);
+/* ── SETUP SCREEN ──────────────────────────────── */
+
+#setup-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 32px;
+  gap: 16px;
+  width: 100%;
 }
 
-.input-group {
-    width: 100%;
-    max-width: 300px;
-    margin: 10px auto;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    flex-wrap: wrap;
+h1 {
+  margin: 0;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(28px, 10vw, 48px);
+  letter-spacing: 6px;
+  color: var(--text);
+  text-align: center;
 }
 
-.input-group label {
-    flex: 1;
-    margin-right: 10px;
-    text-align: center;
-    color: var(--text);
-    font-size: clamp(10px, 5vw, 20px);
-}
-
-.input-group input {
-    width: clamp(60px, 40vw, 100px);
-    flex: 0 0 auto;
-    padding: 8px;
-    text-align: center;
-    color: #fff;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-family: "Oswald", sans-serif;
-    font-size: clamp(16px, 5vw, 24px);
-    font-weight: 600;
-}
-
-.input-group input:focus {
-    outline: 2px solid var(--start);
-    outline-offset: 2px;
-    border-color: var(--start);
-}
-
-.buttons {
-    margin: 12px 0;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 12px;
-}
-
-.buttons button {
-    padding: clamp(12px, 3vw, 18px) clamp(20px, 5vw, 32px);
-    border: none;
-    border-radius: 8px;
-    color: #fff;
-    cursor: pointer;
-    font-family: "Oswald", sans-serif;
-    font-size: clamp(16px, 5vw, 22px);
-    font-weight: 700;
-    letter-spacing: 1px;
-    min-width: 100px;
-    min-height: 48px;
-}
-
-.start-btn {
-    background-color: var(--start);
-}
-.start-btn:hover {
-    background-color: var(--start-hover);
-}
-
-.pause-btn {
-    background-color: var(--pause);
-}
-.pause-btn:hover {
-    background-color: var(--pause-hover);
-}
-
-.reset-btn {
-    background-color: var(--reset);
-}
-.reset-btn:hover {
-    background-color: var(--reset-hover);
-}
-
-#big-timer {
-    font-size: 5rem;
-    font-weight: 700;
-    text-align: center;
-    margin: 20px 0;
-}
-
-#status {
-    text-align: center;
-    line-height: 1.2;
-    color: var(--text);
-    font-family: "Bebas Neue", sans-serif;
-    font-weight: 700;
-    font-size: clamp(60px, 90vw, 150px);
-    text-shadow:
-        0 0 3px rgba(127, 127, 127, 0.6),
-        0 0 6px rgba(127, 127, 127, 0.4);
-}
-
-.rep-info {
-    margin-top: 10px;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-}
-
-#rep-count,
-#rep-timer {
-    text-align: center;
-    color: var(--text);
-    font-family: "Bebas Neue", sans-serif;
-    font-size: clamp(18px, 6vw, 32px);
-    font-weight: 700;
-    letter-spacing: 2px;
-}
-
-.progress-container {
-    width: 90%;
-    height: 10px;
-    margin-top: 16px;
-    border-radius: 12px;
-    background: var(--progress-bg);
-    overflow: hidden;
-}
-
-.progress-bar {
-    width: 0%;
-    height: 100%;
-    background: limegreen;
-    transition:
-        width 0.5s,
-        background-color 0.5s;
-}
-
-/* Confetti */
-#confetti-container {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    pointer-events: none;
-    z-index: 999;
-}
-
-.confetti {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    opacity: 0.8;
-    background-color: red;
-    transform: rotate(0deg);
-    animation: fall linear infinite;
-}
-
-@keyframes fall {
-    0% {
-        transform: translateY(-10%) rotate(0deg);
-    }
-    100% {
-        transform: translateY(110vh) rotate(360deg);
-    }
-}
-
-/* Utility visibility classes */
-.visually-hidden {
-    position: absolute !important;
-    width: 1px !important;
-    height: 1px !important;
-    padding: 0 !important;
-    margin: -1px !important;
-    overflow: hidden !important;
-    clip: rect(0, 0, 0, 0) !important;
-    white-space: nowrap !important;
-    border: 0 !important;
-}
-
-.is-hidden {
-    display: none !important;
-}
-
-.is-visible {
-    display: block !important;
-}
-
-.is-flex {
-    display: flex !important;
-}
-
-/* Small responsiveness tweaks */
-@media (min-width: 768px) {
-    h1 {
-        font-size: clamp(28px, 10vw, 58px);
-    }
-}
-
-/* ── Workout type selector ─────────────────────── */
+/* Workout type buttons */
 .workout-type-selector {
-    width: 90%;
-    max-width: 400px;
-    display: flex;
-    gap: 12px;
-    margin: 16px 0 8px;
+  display: flex;
+  gap: 10px;
+  width: 100%;
 }
 
 .wt-btn {
-    flex: 1;
-    padding: 14px 10px;
-    border: 2px solid var(--muted-border);
-    border-radius: 8px;
-    background: var(--surface);
-    color: var(--text);
-    cursor: pointer;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(18px, 5vw, 24px);
-    letter-spacing: 1px;
-    min-height: 54px;
-    transition: border-color 0.2s, background 0.2s, color 0.2s;
+  flex: 1;
+  padding: 12px 8px;
+  border: 2px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--muted);
+  cursor: pointer;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(16px, 5vw, 22px);
+  letter-spacing: 2px;
+  min-height: 52px;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
 }
 
 .wt-btn.active {
-    border-color: var(--start);
-    background: var(--start);
-    color: #fff;
+  border-color: var(--green);
+  background: rgba(39, 174, 96, 0.12);
+  color: var(--green);
 }
 
 .wt-btn:hover:not(.active) {
-    border-color: var(--text);
+  border-color: #444;
+  color: #aaa;
 }
 
-/* ── History toggle button ─────────────────────── */
-.history-toggle-btn {
-    margin-top: 20px;
-    padding: 10px 20px;
-    background: transparent;
-    border: 1px solid var(--muted-border);
-    border-radius: 6px;
-    color: var(--text);
-    cursor: pointer;
-    font-family: 'Oswald', sans-serif;
-    font-size: clamp(14px, 4vw, 18px);
-    letter-spacing: 1px;
-    min-height: 44px;
-    transition: border-color 0.2s;
+/* Input section */
+#input-box {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
 }
 
-.history-toggle-btn:hover {
-    border-color: var(--text);
+.input-row {
+  display: flex;
+  gap: 12px;
 }
 
-/* ── History panel ─────────────────────────────── */
-.history-panel {
-    width: 90%;
-    max-width: 500px;
-    margin: 12px 0 24px;
-    padding: 16px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: var(--surface);
+.input-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 }
 
-.history-panel canvas {
-    width: 100% !important;
-    max-height: 220px;
+.input-group label {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--muted);
+  font-family: 'Oswald', sans-serif;
 }
 
-.history-log {
-    margin-top: 16px;
+.input-group input {
+  width: 100%;
+  padding: 10px;
+  text-align: center;
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(24px, 8vw, 36px);
+  font-weight: 700;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.input-group input::-webkit-outer-spin-button,
+.input-group input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+.input-group input:focus {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+  border-color: var(--green);
+}
+
+#rep-pace-hint {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  min-height: 18px;
+}
+
+/* Start button */
+.start-btn {
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--green);
+  color: #fff;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(20px, 6vw, 28px);
+  letter-spacing: 4px;
+  cursor: pointer;
+  min-height: 56px;
+  transition: background 0.15s;
+}
+
+.start-btn:hover { background: #219150; }
+.start-btn:active { background: #1a7a42; }
+
+/* History section */
+#history-panel {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.history-title {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--muted);
+}
+
+.history-legend {
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-dot--6count { color: var(--green); }
+.legend-dot--navyseals { color: var(--blue); }
+
+#history-chart {
+  width: 100% !important;
+  max-height: 180px;
+}
+
+#history-log {
+  margin-top: 12px;
 }
 
 .log-entry {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: clamp(12px, 3.5vw, 15px);
-    gap: 8px;
-    flex-wrap: wrap;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  gap: 8px;
 }
 
-.log-entry:last-child {
-    border-bottom: none;
-}
-
-.log-date {
-    color: #aaa;
-    flex: 0 0 auto;
-}
-
-.log-type--6count {
-    color: #27ae60;
-    font-weight: 700;
-    flex: 0 0 auto;
-}
-
-.log-type--navyseals {
-    color: #3498db;
-    font-weight: 700;
-    flex: 0 0 auto;
-}
-
-.log-reps {
-    flex: 1;
-    text-align: right;
-}
-
-.log-mins {
-    color: #aaa;
-    flex: 0 0 auto;
-}
+.log-entry:last-child { border-bottom: none; }
+.log-date { color: var(--muted); }
+.log-type--6count { color: var(--green); font-weight: 700; }
+.log-type--navyseals { color: var(--blue); font-weight: 700; }
+.log-reps { flex: 1; text-align: right; }
+.log-mins { color: var(--muted); }
 
 .no-history {
-    text-align: center;
-    color: #aaa;
-    font-size: 14px;
-    margin: 0;
-    padding: 12px 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  padding: 16px 0;
+  margin: 0;
 }
 
-/* ── Workout type badge (active session) ───────── */
+/* ── ACTIVE SCREEN ─────────────────────────────── */
+
+#active-screen {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100dvh;
+}
+
+/* Top panel: total workout clock */
+#top-panel {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 16px 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Dot grid: rep progress */
+#dot-grid {
+  padding: 12px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  background: #0a0a0a;
+  border-bottom: 1px solid var(--border);
+  min-height: 60px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #222;
+  transition: background 0.2s;
+}
+
+.dot--done { background: var(--green); }
+.dot--current { background: var(--orange); }
+
+/* Bottom panel: per-rep countdown */
+#bottom-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  gap: 8px;
+  text-align: center;
+}
+
+/* Shared panel label */
+.panel-label {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--muted);
+  font-family: 'Oswald', sans-serif;
+  text-transform: uppercase;
+}
+
+/* Total workout timer (top) */
+#workout-timer {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(36px, 12vw, 56px);
+  color: var(--green);
+  letter-spacing: 3px;
+  line-height: 1;
+}
+
+#workout-timer.dimmed { color: #2d6a4a; }
+
+/* Per-rep countdown (bottom, large) */
+#big-timer {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(72px, 22vw, 120px);
+  color: var(--text);
+  letter-spacing: 2px;
+  line-height: 1;
+}
+
+#big-timer.prep { color: var(--orange); }
+#big-timer.done { color: var(--green); font-size: clamp(48px, 14vw, 80px); }
+
+/* Rep count label */
+#rep-count {
+  font-size: clamp(14px, 4vw, 18px);
+  color: var(--blue);
+  letter-spacing: 2px;
+  font-family: 'Oswald', sans-serif;
+}
+
+/* Motivational message */
+#message {
+  font-size: 12px;
+  color: #444;
+  font-style: italic;
+  min-height: 18px;
+  max-width: 260px;
+  transition: opacity 0.4s;
+}
+
+/* Controls row */
+.buttons {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #0a0a0a;
+  border-top: 1px solid var(--border);
+  justify-content: center;
+}
+
+.pause-btn, .reset-btn {
+  flex: 1;
+  max-width: 160px;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 6px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(16px, 5vw, 20px);
+  letter-spacing: 2px;
+  cursor: pointer;
+  min-height: 48px;
+  transition: background 0.15s;
+}
+
+.pause-btn { background: #1e2e1e; color: var(--green); }
+.pause-btn:hover { background: #26382e; }
+
+.reset-btn { background: var(--surface-2); color: var(--muted); }
+.reset-btn:hover { background: #222; color: #aaa; }
+
+/* Workout type badge */
 .workout-type-badge {
-    text-align: center;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(13px, 3.5vw, 17px);
-    letter-spacing: 3px;
-    padding: 4px 14px;
-    border-radius: 20px;
-    margin: 0 auto 6px;
-    width: fit-content;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  letter-spacing: 3px;
+  padding: 3px 12px;
+  border-radius: 20px;
 }
 
 .workout-type-badge--6count {
-    background: rgba(39, 174, 96, 0.2);
-    color: #27ae60;
-    border: 1px solid #27ae60;
+  background: rgba(39, 174, 96, 0.12);
+  color: var(--green);
+  border: 1px solid var(--green);
 }
 
 .workout-type-badge--navyseals {
-    background: rgba(52, 152, 219, 0.2);
-    color: #3498db;
-    border: 1px solid #3498db;
+  background: rgba(52, 152, 219, 0.12);
+  color: var(--blue);
+  border: 1px solid var(--blue);
 }
 
+/* ── CONFETTI ───────────────────────────────────── */
+#confetti-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+  overflow: hidden;
+}
+
+.confetti {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  opacity: 0.8;
+  animation: fall linear infinite;
+}
+
+@keyframes fall {
+  from { transform: translateY(-10%) rotate(0deg); }
+  to   { transform: translateY(110vh) rotate(360deg); }
+}
+
+/* ── ACCESSIBILITY ──────────────────────────────── */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important; height: 1px !important;
+  padding: 0 !important; margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0,0,0,0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
