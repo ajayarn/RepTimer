@@ -1,59 +1,95 @@
+:root {
+    --bg: #121212;
+    --surface: #1e1e1e;
+    --border: #333;
+    --text: #f0f0f0;
+    --muted-border: #555;
+
+    --start: #27ae60;
+    --start-hover: #219150;
+    --pause: #e67e22;
+    --pause-hover: #cf711a;
+    --reset: #c0392b;
+    --reset-hover: #a8322b;
+
+    --progress-bg: #444;
+    --shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 body {
-    font-family: 'Oswald', sans-serif;
-    background: #121212;
-    color: #f0f0f0;
+    margin: 0;
+    padding: 20px;
+    font-family: "Oswald", sans-serif;
+    font-size: 18px;
+    color: var(--text);
+    background: var(--bg);
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
 }
 
-
-h1, #message {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(20px, 8vw, 40px);
-    color: #f0f0f0;
-    text-align: center;
+/* Headline / rotating motivation text */
+h1,
+#message {
+    margin: 0;
+    max-width: 90%;
     min-height: 2em;
     max-height: 2em;
-    
-    /* font-size: clamp(18px, 5vw, 30px);
-    font-weight: 500;
-    color: #fff; */
-    max-width: 90%;
+    text-align: center;
+    color: var(--text);
+    font-family: "Bebas Neue", sans-serif;
+    font-size: clamp(20px, 8vw, 40px);
     opacity: 1;
     transition: opacity 0.4s ease;
 }
 
+/* Shared card shell */
+.input-box {
+    width: 90%;
+    max-width: 400px;
+    margin: 10px 0;
+    padding: 10px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
 .input-group {
+    width: 100%;
+    max-width: 300px;
+    margin: 10px auto;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    margin: 10px 0;
-    width: 100%;
-    max-width: 300px;
     flex-wrap: wrap;
 }
 
 .input-group label {
     flex: 1;
-    text-align: center;
-    font-size: clamp(10px, 5vw, 20px);
     margin-right: 10px;
-    color: #f0f0f0;
+    text-align: center;
+    color: var(--text);
+    font-size: clamp(10px, 5vw, 20px);
 }
 
 .input-group input {
-    text-align: center;
+    width: clamp(60px, 40vw, 100px);
     flex: 0 0 auto;
     padding: 8px;
-    font-size: clamp(16px, 5vw, 24px);
-    width: clamp(60px, 40vw, 100px);
-    background: #1e1e1e;
+    text-align: center;
     color: #fff;
-    border: 1px solid #555;
+    background: var(--surface);
+    border: 1px solid var(--muted-border);
     border-radius: 4px;
-    font-family: 'Oswald', sans-serif;
+    font-family: "Oswald", sans-serif;
+    font-size: clamp(16px, 5vw, 24px);
 }
 
 .buttons {
@@ -64,104 +100,99 @@ h1, #message {
     gap: 10px;
 }
 
-#rep-count, #rep-timer{
-    font-family: 'Bebas Neue', sans-serif;
-    letter-spacing: 2px;
-    font-size: clamp(10px, 10vw, 40px);
-    color: #f0f0f0;
+.buttons button {
+    padding: clamp(10px, 2vw, 16px) clamp(16px, 4vw, 20px);
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    font-family: "Oswald", sans-serif;
+    font-size: clamp(14px, 5vw, 20px);
+}
+
+.start-btn {
+    background-color: var(--start);
+}
+.start-btn:hover {
+    background-color: var(--start-hover);
+}
+
+.pause-btn {
+    background-color: var(--pause);
+}
+.pause-btn:hover {
+    background-color: var(--pause-hover);
+}
+
+.reset-btn {
+    background-color: var(--reset);
+}
+.reset-btn:hover {
+    background-color: var(--reset-hover);
+}
+
+#big-timer {
+    font-size: 5rem;
+    font-weight: 700;
     text-align: center;
+    margin: 20px 0;
+}
+
+#status {
+    text-align: center;
+    line-height: 1.2;
+    color: var(--text);
+    font-family: "Bebas Neue", sans-serif;
+    font-weight: 700;
+    font-size: clamp(60px, 90vw, 150px);
+    text-shadow:
+        0 0 3px rgba(127, 127, 127, 0.6),
+        0 0 6px rgba(127, 127, 127, 0.4);
 }
 
 .rep-info {
-  display: flex;
-  justify-content: center;
-  gap: 20px; /* space between them */
-  margin-top: 10px;
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
 }
 
-#rep-count, #rep-timer {
-  font-size: clamp(18px, 6vw, 32px);
-  font-weight: bold;
-  text-align: center;
+#rep-count,
+#rep-timer {
+    text-align: center;
+    color: var(--text);
+    font-family: "Bebas Neue", sans-serif;
+    font-size: clamp(18px, 6vw, 32px);
+    font-weight: 700;
+    letter-spacing: 2px;
 }
 
-.buttons button {
-    padding: clamp(10px, 2vw, 16px) clamp(16px, 4vw, 20px);
-    font-size: clamp(14px, 5vw, 20px);
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    color: white;
-    font-family: 'Oswald', sans-serif;
-}
-
-.start-btn { background-color: #27ae60; }
-.pause-btn { background-color: #e67e22; }
-.reset-btn { background-color: #c0392b; }
-
-.start-btn:hover { background-color: #219150; }
-.pause-btn:hover { background-color: #cf711a; }
-.reset-btn:hover { background-color: #a8322b; }
-
-#status {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(60px, 90vw, 150px);
-  font-weight: bold;
-  color: #f0f0f0;
-  text-align: center;
-  line-height: 1.2;
-  text-shadow:
-    0 0 3px rgba(127, 127, 127, 0.6),
-    0 0 6px rgba(127, 127, 127, 0.4);
-}
 .progress-container {
     width: 90%;
     height: 24px;
-    background: #444;
-    border-radius: 12px;
-    overflow: hidden;
     margin-top: 20px;
+    border-radius: 12px;
+    background: var(--progress-bg);
+    overflow: hidden;
 }
 
 .progress-bar {
-    height: 100%;
     width: 0%;
+    height: 100%;
     background: limegreen;
-    transition: width 0.5s, background-color 0.5s;
+    transition:
+        width 0.5s,
+        background-color 0.5s;
 }
 
-/* #message {
-    margin-top: 20px;
-    font-size: clamp(18px, 5vw, 30px);
-    font-weight: 500;
-    text-align: center;
-    color: #fff;
-} */
-
-@keyframes glowPulse {
-  0%   { box-shadow: 0 0 10px rgba(255,255,255,0.3); }
-  50%  { box-shadow: 0 0 25px rgba(255,255,255,0.7); }
-  100% { box-shadow: 0 0 10px rgba(255,255,255,0.3); }
-}
-
-#motivationGif {
-    margin-top: 10px;
-    max-width: 90%;
-    border-radius: 12px;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    animation: glowPulse 2s ease-in-out infinite;
-}
-
+/* Confetti */
 #confetti-container {
     position: fixed;
-    pointer-events: none;
-    top: 0;
-    left: 0;
+    inset: 0;
     width: 100%;
     height: 100%;
     overflow: hidden;
+    pointer-events: none;
     z-index: 999;
 }
 
@@ -169,39 +200,49 @@ h1, #message {
     position: absolute;
     width: 10px;
     height: 10px;
-    background-color: red;
     opacity: 0.8;
-    animation: fall linear infinite;
+    background-color: red;
     transform: rotate(0deg);
+    animation: fall linear infinite;
 }
 
 @keyframes fall {
-    0% { transform: translateY(-10%) rotate(0deg); }
-    100% { transform: translateY(110vh) rotate(360deg); }
+    0% {
+        transform: translateY(-10%) rotate(0deg);
+    }
+    100% {
+        transform: translateY(110vh) rotate(360deg);
+    }
 }
 
-@media only screen {
-    body {
-        font-size: 18px;
-    }
+/* Utility visibility classes */
+.visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
 
+.is-hidden {
+    display: none !important;
+}
+
+.is-visible {
+    display: block !important;
+}
+
+.is-flex {
+    display: flex !important;
+}
+
+/* Small responsiveness tweaks */
+@media (min-width: 768px) {
     h1 {
         font-size: clamp(28px, 10vw, 58px);
     }
-
-    #motivationGif {
-        max-width: 80vw;
-        /* max-height: 10vw; */
-    }
-}
-
-.input-box, .button-box {
-    border: 2px solid #333;
-    border-radius: 10px;
-    padding: 10px;
-    margin: 10px 0;
-    background: #1e1e1e;
-    width: 90%;
-    max-width: 400px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.6);
 }
