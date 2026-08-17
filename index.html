@@ -126,6 +126,27 @@
                     aria-valuenow="0"
                 ></div>
             </div>
+
+            <button
+                class="history-toggle-btn"
+                id="history-toggle-btn"
+                type="button"
+                onclick="toggleHistory()"
+                aria-expanded="false"
+                aria-controls="history-panel"
+            >
+                &#9658; History
+            </button>
+
+            <section
+                id="history-panel"
+                class="history-panel"
+                aria-label="Workout history"
+                hidden
+            >
+                <canvas id="history-chart" aria-label="Workout progress chart"></canvas>
+                <div id="history-log" class="history-log" aria-label="Recent workouts"></div>
+            </section>
         </main>
 
         <audio
@@ -137,6 +158,7 @@
 
         <noscript>This app requires JavaScript to run the timer.</noscript>
 
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
         <script src="app.js"></script>
         <script>
             (function () {

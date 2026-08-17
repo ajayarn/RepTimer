@@ -280,3 +280,93 @@ h1,
 .wt-btn:hover:not(.active) {
     border-color: var(--text);
 }
+
+/* ── History toggle button ─────────────────────── */
+.history-toggle-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: transparent;
+    border: 1px solid var(--muted-border);
+    border-radius: 6px;
+    color: var(--text);
+    cursor: pointer;
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(14px, 4vw, 18px);
+    letter-spacing: 1px;
+    min-height: 44px;
+    transition: border-color 0.2s;
+}
+
+.history-toggle-btn:hover {
+    border-color: var(--text);
+}
+
+/* ── History panel ─────────────────────────────── */
+.history-panel {
+    width: 90%;
+    max-width: 500px;
+    margin: 12px 0 24px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+}
+
+.history-panel canvas {
+    width: 100% !important;
+    max-height: 220px;
+}
+
+.history-log {
+    margin-top: 16px;
+}
+
+.log-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: clamp(12px, 3.5vw, 15px);
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.log-entry:last-child {
+    border-bottom: none;
+}
+
+.log-date {
+    color: #aaa;
+    flex: 0 0 auto;
+}
+
+.log-type--6count {
+    color: #27ae60;
+    font-weight: 700;
+    flex: 0 0 auto;
+}
+
+.log-type--navyseals {
+    color: #3498db;
+    font-weight: 700;
+    flex: 0 0 auto;
+}
+
+.log-reps {
+    flex: 1;
+    text-align: right;
+}
+
+.log-mins {
+    color: #aaa;
+    flex: 0 0 auto;
+}
+
+.no-history {
+    text-align: center;
+    color: #aaa;
+    font-size: 14px;
+    margin: 0;
+    padding: 12px 0;
+}

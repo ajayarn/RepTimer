@@ -98,6 +98,11 @@ const el = {
   confettiContainer: document.getElementById("confetti-container"),
 
   clapSound: document.getElementById("clapSound"),
+
+  historyToggleBtn:   document.getElementById('history-toggle-btn'),
+  historyPanel:       document.getElementById('history-panel'),
+  historyChartCanvas: document.getElementById('history-chart'),
+  historyLog:         document.getElementById('history-log'),
 };
 
 const state = {
@@ -162,6 +167,113 @@ function selectWorkoutType(type) {
 }
 
 window.selectWorkoutType = selectWorkoutType;
+
+function renderHistoryLog(entries) {
+  if (!el.historyLog) return;
+  if (entries.length === 0) {
+    el.historyLog.innerHTML = '<p class="no-history">No workouts logged yet. Complete a workout to see history.</p>';
+    return;
+  }
+  const recent = entries.slice(-10).reverse();
+  el.historyLog.innerHTML = recent.map((e) => {
+    const label = e.type === '6count' ? '6-Count' : 'Navy Seals';
+    return `<div class="log-entry">
+      <span class="log-date">${e.date}</span>
+      <span class="log-type log-type--${e.type}">${label}</span>
+      <span class="log-reps">${e.reps} reps</span>
+      <span class="log-mins">${e.minutes}min</span>
+    </div>`;
+  }).join('');
+}
+
+function renderHistoryChart(entries) {
+  if (!el.historyChartCanvas || typeof Chart === 'undefined') return;
+
+  if (state.chartInstance) {
+    state.chartInstance.destroy();
+    state.chartInstance = null;
+  }
+
+  const sorted = entries
+    .slice()
+    .sort((a, b) => (a.completedAt < b.completedAt ? -1 : 1))
+    .slice(-30);
+
+  const sixData = sorted
+    .filter((e) => e.type === '6count')
+    .map((e) => ({ x: e.date, y: e.reps }));
+  const navyData = sorted
+    .filter((e) => e.type === 'navyseals')
+    .map((e) => ({ x: e.date, y: e.reps }));
+
+  state.chartInstance = new Chart(el.historyChartCanvas, {
+    type: 'line',
+    data: {
+      datasets: [
+        {
+          label: '6-Count',
+          data: sixData,
+          borderColor: '#27ae60',
+          backgroundColor: 'rgba(39,174,96,0.15)',
+          tension: 0.3,
+          pointRadius: 5,
+          fill: true,
+        },
+        {
+          label: 'Navy Seals',
+          data: navyData,
+          borderColor: '#3498db',
+          backgroundColor: 'rgba(52,152,219,0.15)',
+          tension: 0.3,
+          pointRadius: 5,
+          fill: true,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      scales: {
+        x: {
+          type: 'category',
+          ticks: { color: '#f0f0f0', maxRotation: 45, font: { family: 'Oswald' } },
+          grid: { color: '#333' },
+        },
+        y: {
+          beginAtZero: true,
+          ticks: { color: '#f0f0f0', font: { family: 'Oswald' } },
+          grid: { color: '#333' },
+          title: { display: true, text: 'Reps', color: '#f0f0f0' },
+        },
+      },
+      plugins: {
+        legend: { labels: { color: '#f0f0f0', font: { family: 'Oswald' } } },
+      },
+    },
+  });
+}
+
+function renderHistory() {
+  const log = loadLog();
+  renderHistoryChart(log);
+  renderHistoryLog(log);
+}
+
+function toggleHistory() {
+  if (!el.historyPanel || !el.historyToggleBtn) return;
+  const isHidden = el.historyPanel.hasAttribute('hidden');
+  if (isHidden) {
+    el.historyPanel.removeAttribute('hidden');
+    el.historyToggleBtn.textContent = '▾ History';
+    el.historyToggleBtn.setAttribute('aria-expanded', 'true');
+    renderHistory();
+  } else {
+    el.historyPanel.setAttribute('hidden', '');
+    el.historyToggleBtn.textContent = '▸ History';
+    el.historyToggleBtn.setAttribute('aria-expanded', 'false');
+  }
+}
+
+window.toggleHistory = toggleHistory;
 
 function getAudioContext() {
   if (state.audioContext) {
