@@ -391,6 +391,19 @@ function finishWorkout(runId) {
   state.phaseRemainingMs = 0;
   state.paused = false;
   state.currentRep = state.reps;
+
+  if (state.workoutType) {
+    const now = new Date();
+    saveEntry({
+      id: String(now.getTime()),
+      type: state.workoutType,
+      date: now.toISOString().slice(0, 10),
+      minutes: parseFloat(((state.reps * state.intervalSeconds) / 60).toFixed(1)),
+      reps: state.reps,
+      completedAt: now.toISOString(),
+    });
+  }
+
   updateProgress();
 
   el.status.textContent = "Well Done!";
