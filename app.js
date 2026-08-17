@@ -47,6 +47,35 @@ const motivationFinal = [
   "You're a machine. Bring it home!",
 ];
 
+const STORAGE_KEY = 'bdt_log';
+
+function loadLog() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (_) {
+    return [];
+  }
+}
+
+function saveEntry(entry) {
+  const log = loadLog();
+  log.push(entry);
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(log));
+  } catch (_) {
+    // Storage quota exceeded — silently ignore
+  }
+}
+
+function getLastEntryForType(type) {
+  const log = loadLog();
+  for (let i = log.length - 1; i >= 0; i--) {
+    if (log[i].type === type) return log[i];
+  }
+  return null;
+}
+
 const el = {
   time: document.getElementById("time"),
   reps: document.getElementById("reps"),
@@ -85,6 +114,9 @@ const state = {
 
   audioContext: null,
   runId: 0, // invalidates stale async callbacks
+
+  workoutType: null,    // '6count' | 'navyseals' | null
+  chartInstance: null,  // Chart.js instance reference for destroy/recreate
 };
 
 function wireAccessibility() {
