@@ -9,7 +9,9 @@ RepTimer helps you complete a target number of reps over a fixed workout duratio
 - progress tracking,
 - motivational messages,
 - sound cues,
-- and celebration confetti at the finish.
+- celebration confetti at the finish,
+- session history with a progress chart,
+- and persistence of your last rep count per workout type.
 
 ---
 
@@ -37,6 +39,10 @@ RepTimer helps you complete a target number of reps over a fixed workout duratio
   - Clap sound at workout completion
 - **Finish effects**
   - Completion message and confetti animation.
+- **Workout type selector**
+  - Choose 6-Count or Navy Seals before starting; last rep count for each type auto-loads.
+- **Session history**
+  - Toggle the History panel to see a line chart and a log of your last 10 workouts.
 
 ---
 
@@ -46,7 +52,6 @@ RepTimer helps you complete a target number of reps over a fixed workout duratio
 - `style.css` — responsive styling
 - `app.js` — timer logic and state management
 - `timersounds/` — audio assets (e.g., clapping)
-- `timergifs/` — optional visual assets
 
 ---
 
@@ -56,10 +61,12 @@ No build tools or dependencies are required.
 
 1. Clone or download this repository.
 2. Open `index.html` in your browser.
-3. Enter:
+3. Select a workout type: **6-Count** or **Navy Seals**.
+4. Enter:
    - **Mins** (total session duration)
    - **Reps** (target number of reps)
-4. Click **Start**.
+5. Click **Start**.
+6. Use the **History** button to view your workout chart and recent log.
 
 ---
 
@@ -112,7 +119,6 @@ You can easily tweak:
 
 ## Known Limitations
 
-- No persistence of settings between page reloads.
 - No keyboard shortcuts.
 - No dedicated accessibility labels/live region tuning yet.
 - No test suite currently included.
@@ -121,11 +127,9 @@ You can easily tweak:
 
 ## Roadmap Ideas
 
-- Save last used settings in local storage
 - Add keyboard controls and better accessibility semantics
 - Add interval presets (e.g., EMOM, Tabata-like modes)
 - Add optional vibration/mobile haptics
-- Add session history and stats
 
 ---
 

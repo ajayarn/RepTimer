@@ -52,7 +52,8 @@ const STORAGE_KEY = 'bdt_log';
 function loadLog() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
   } catch (_) {
     return [];
   }
@@ -201,34 +202,38 @@ function renderHistoryChart(entries) {
     .sort((a, b) => (a.completedAt < b.completedAt ? -1 : 1))
     .slice(-30);
 
-  const sixData = sorted
-    .filter((e) => e.type === '6count')
-    .map((e) => ({ x: e.date, y: e.reps }));
-  const navyData = sorted
-    .filter((e) => e.type === 'navyseals')
-    .map((e) => ({ x: e.date, y: e.reps }));
+  const labels = [...new Set(sorted.map((e) => e.date))].sort();
 
   state.chartInstance = new Chart(el.historyChartCanvas, {
     type: 'line',
     data: {
+      labels,
       datasets: [
         {
           label: '6-Count',
-          data: sixData,
+          data: labels.map((d) => {
+            const e = sorted.filter((x) => x.type === '6count' && x.date === d).pop();
+            return e ? e.reps : null;
+          }),
           borderColor: '#27ae60',
           backgroundColor: 'rgba(39,174,96,0.15)',
           tension: 0.3,
           pointRadius: 5,
           fill: true,
+          spanGaps: true,
         },
         {
           label: 'Navy Seals',
-          data: navyData,
+          data: labels.map((d) => {
+            const e = sorted.filter((x) => x.type === 'navyseals' && x.date === d).pop();
+            return e ? e.reps : null;
+          }),
           borderColor: '#3498db',
           backgroundColor: 'rgba(52,152,219,0.15)',
           tension: 0.3,
           pointRadius: 5,
           fill: true,
+          spanGaps: true,
         },
       ],
     },
@@ -329,6 +334,7 @@ function updateProgress() {
   const percent = Math.max(0, Math.min(100, rawPercent));
 
   el.progressBar.style.width = `${percent}%`;
+  el.progressBar.setAttribute('aria-valuenow', String(Math.round(percent)));
 
   if (percent < 33) {
     el.progressBar.style.backgroundColor = "green";
@@ -522,7 +528,7 @@ function finishWorkout(runId) {
     saveEntry({
       id: String(now.getTime()),
       type: state.workoutType,
-      date: now.toISOString().slice(0, 10),
+      date: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`,
       minutes: parseFloat(((state.reps * state.intervalSeconds) / 60).toFixed(1)),
       reps: state.reps,
       completedAt: now.toISOString(),
@@ -548,6 +554,8 @@ function finishWorkout(runId) {
     if (runId !== state.runId) return;
     launchConfetti(runId);
   }, 1000);
+
+  if (el.historyPanel && !el.historyPanel.hasAttribute('hidden')) renderHistory();
 }
 
 function validateInputs() {
