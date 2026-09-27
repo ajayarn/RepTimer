@@ -10,42 +10,6 @@
 
 const PREP_SECONDS = 10;
 const COUNTDOWN_TICK_MS = 200;
-const MESSAGE_FADE_MS = 400;
-
-const motivationEarly = [
-  "Every great session starts with one rep.",
-  "You're already ahead of everyone on the couch.",
-  "Start strong!",
-  "You showed up. That's step one.",
-  "Keep moving.",
-  "Let's set the tone right now.",
-  "Consistency. That's powerful.",
-  "You've started - now let's roll!",
-];
-
-const motivationMid = [
-  "You're in the zone now. Stay there.",
-  "Push. Breathe. Repeat.",
-  "Each rep is a step toward stronger you.",
-  "No one else can do this for you.",
-  "You're not tired, you're transforming.",
-  "This is your turning point.",
-  "You're halfway to proud.",
-  "Dig deep. Show up for yourself.",
-  "Power comes from persistence.",
-];
-
-const motivationFinal = [
-  "You're almost there - don't slow down now!",
-  "Last stretch - leave it all out here!",
-  "Champions are built in the final reps.",
-  "Crush the finish - you deserve the pride.",
-  "You've come this far. Now dominate!",
-  "Finish strong. Future you is watching.",
-  "Every second counts - let's go!",
-  "This is where growth lives.",
-  "You're a machine. Bring it home!",
-];
 
 const STORAGE_KEY = 'bdt_log';
 
@@ -105,6 +69,7 @@ const el = {
   activeScreen:  document.getElementById('active-screen'),
   workoutTimer:  document.getElementById('workout-timer'),
   dotGrid:       document.getElementById('dot-grid'),
+  dotGridCount:  document.getElementById('dot-grid-count'),
   repPaceHint:   document.getElementById('rep-pace-hint'),
   topPanelLabel:    document.getElementById('top-panel-label'),
   validationError:  document.getElementById('validation-error'),
@@ -113,7 +78,6 @@ const el = {
 const state = {
   activeTimeout: null,
   countdownInterval: null,
-  messageTimeout: null,
   confettiCleanupTimeout: null,
 
   intervalSeconds: 0,
@@ -388,36 +352,8 @@ function updateRepPaceHint() {
   }
 }
 
-function setMessage(text, { fade = false, runId = state.runId } = {}) {
-  if (!fade) {
-    el.message.textContent = text;
-    return;
-  }
-
-  if (state.messageTimeout) {
-    clearTimeout(state.messageTimeout);
-    state.messageTimeout = null;
-  }
-
-  el.message.style.opacity = "0";
-  state.messageTimeout = setTimeout(() => {
-    // Ignore stale async updates from old runs.
-    if (runId !== state.runId) return;
-    el.message.textContent = text;
-    el.message.style.opacity = "1";
-    state.messageTimeout = null;
-  }, MESSAGE_FADE_MS);
-}
-
-function showMotivation(runId) {
-  const progress = state.reps > 0 ? state.currentRep / state.reps : 0;
-  let msgPool = motivationFinal;
-
-  if (progress < 0.33) msgPool = motivationEarly;
-  else if (progress < 0.66) msgPool = motivationMid;
-
-  const msg = msgPool[Math.floor(Math.random() * msgPool.length)];
-  setMessage(msg, { fade: true, runId });
+function setMessage(text) {
+  el.message.textContent = text;
 }
 
 function clearActiveTimers() {
@@ -433,11 +369,6 @@ function clearActiveTimers() {
 }
 
 function clearAllDelayedUi() {
-  if (state.messageTimeout) {
-    clearTimeout(state.messageTimeout);
-    state.messageTimeout = null;
-  }
-
   if (state.confettiCleanupTimeout) {
     clearTimeout(state.confettiCleanupTimeout);
     state.confettiCleanupTimeout = null;
@@ -499,6 +430,7 @@ function renderActivePhase() {
       el.workoutTimer.className = 'dimmed';
     }
     el.repCount.textContent = `0 of ${state.reps}`;
+    if (el.dotGridCount) el.dotGridCount.textContent = `0 / ${state.reps}`;
     return;
   }
 
@@ -516,6 +448,7 @@ function renderActivePhase() {
       el.workoutTimer.className = '';
     }
     el.repCount.textContent = `Rep ${state.currentRep + 1} of ${state.reps}`;
+    if (el.dotGridCount) el.dotGridCount.textContent = `${state.currentRep + 1} / ${state.reps}`;
     updateDotGrid(state.currentRep, state.currentRep);
   }
 }
@@ -544,7 +477,6 @@ function runPhaseCompletion(runId) {
     }
 
     beep();
-    showMotivation(runId);
     updateProgress();
 
     state.phaseRemainingMs = state.intervalSeconds * 1000;
@@ -602,6 +534,7 @@ function finishWorkout(runId) {
   el.bigTimer.className = 'done';
   const totalMinutes = parseFloat(((state.reps * state.intervalSeconds) / 60).toFixed(1));
   el.repCount.textContent = `reps · ${totalMinutes} min`;
+  if (el.dotGridCount) el.dotGridCount.textContent = `${state.reps} / ${state.reps}`;
   setMessage('Proud of you!');
   updateDotGrid(state.reps); // fill all dots
 
@@ -739,6 +672,7 @@ function resetTimer() {
   el.status.textContent = "Ready";
   setMessage("REP TIMER");
   el.repCount.textContent = "";
+  if (el.dotGridCount) el.dotGridCount.textContent = "";
   el.bigTimer.textContent = "Ready";
 
   setWorkoutTypeBadge(null);
