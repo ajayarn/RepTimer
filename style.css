@@ -40,6 +40,7 @@
 
 body {
   margin: 0;
+  min-height: 100vh;
   min-height: 100dvh;
   font-family: 'Oswald', sans-serif;
   background: var(--bg);
@@ -308,6 +309,7 @@ h1 {
   flex-direction: column;
   align-items: center;
   width: 100%;
+  min-height: 100vh;
   min-height: 100dvh;
   gap: 20px;
   padding-bottom: 24px;
@@ -346,8 +348,10 @@ h1 {
 /* Ring: per-rep countdown */
 #ring-wrap {
   position: relative;
-  width: min(70vw, 260px);
-  height: min(70vw, 260px);
+  width: 260px;
+  max-width: 70vw;
+  height: 260px;
+  max-height: 70vw;
   margin: 0 auto;
 }
 
@@ -369,7 +373,10 @@ h1 {
 
 #ring-center {
   position: absolute;
-  inset: 14%;
+  top: 14%;
+  right: 14%;
+  bottom: 14%;
+  left: 14%;
   border-radius: 50%;
   background: var(--surface);
   box-shadow: var(--neu-inset-lg);
@@ -420,15 +427,15 @@ h1 {
 .stat-card {
   flex: 1;
   text-align: center;
-  padding: 12px 6px;
-  border-radius: 14px;
+  padding: 14px 6px;
+  border-radius: 16px;
   background: var(--surface);
   box-shadow: var(--neu-raised-sm);
 }
 
 .stat-label {
-  font-size: 9px;
-  letter-spacing: 1.5px;
+  font-size: clamp(10px, 3vw, 13px);
+  letter-spacing: 1px;
   color: var(--muted);
   font-family: 'Oswald', sans-serif;
   text-transform: uppercase;
@@ -436,9 +443,9 @@ h1 {
 
 .stat-value {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(16px, 5vw, 22px);
+  font-size: clamp(24px, 8vw, 32px);
   color: var(--text);
-  margin-top: 4px;
+  margin-top: 6px;
   letter-spacing: 1px;
 }
 
@@ -480,7 +487,10 @@ h1 {
 /* ── CONFETTI ───────────────────────────────────── */
 #confetti-container {
   position: fixed;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   pointer-events: none;
   z-index: 999;
   overflow: hidden;
