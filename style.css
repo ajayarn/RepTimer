@@ -419,22 +419,25 @@ h1 {
 /* Stat row */
 #stat-row {
   display: flex;
-  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
   padding: 0 16px;
   width: 100%;
 }
 
 .stat-card {
-  flex: 1;
+  flex: 1 1 150px;
+  max-width: 220px;
   text-align: center;
-  padding: 14px 6px;
-  border-radius: 16px;
+  padding: 28px 12px;
+  border-radius: 20px;
   background: var(--surface);
   box-shadow: var(--neu-raised-sm);
 }
 
 .stat-label {
-  font-size: clamp(10px, 3vw, 13px);
+  font-size: clamp(20px, 6vw, 26px);
   letter-spacing: 1px;
   color: var(--muted);
   font-family: 'Oswald', sans-serif;
@@ -443,9 +446,9 @@ h1 {
 
 .stat-value {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(24px, 8vw, 32px);
+  font-size: clamp(48px, 16vw, 64px);
   color: var(--text);
-  margin-top: 6px;
+  margin-top: 8px;
   letter-spacing: 1px;
 }
 
@@ -459,6 +462,7 @@ h1 {
   padding: 0 16px;
   justify-content: center;
   width: 100%;
+  margin-top: auto;
 }
 
 .pause-btn, .reset-btn {
