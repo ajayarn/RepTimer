@@ -71,6 +71,7 @@ const el = {
   ringProgress:  document.getElementById('ring-progress'),
   ringCenter:    document.getElementById('ring-center'),
   statRepsDone:  document.getElementById('stat-reps-done'),
+  repsStatLabel: document.getElementById('reps-stat-label'),
   themeToggle:   document.getElementById('theme-toggle'),
   repPaceHint:   document.getElementById('rep-pace-hint'),
   topPanelLabel:    document.getElementById('top-panel-label'),
@@ -100,6 +101,9 @@ const state = {
   workoutType: null,    // '6count' | 'navyseals' | null
   chartInstance: null,  // Chart.js instance reference for destroy/recreate
   totalWorkoutMs: 0,
+
+  showElapsed: false,   // time stat: false = REMAINING, true = ELAPSED
+  showRepsLeft: false,  // reps stat: false = REPS DONE, true = REPS LEFT
 };
 
 function wireAccessibility() {
@@ -399,6 +403,68 @@ function setButtonState(mode) {
   }
 }
 
+function computeWorkoutRemainingMs() {
+  if (state.currentPhase === 'prep') return state.totalWorkoutMs;
+  if (state.currentPhase !== 'rep') return 0;
+
+  const remainingMs = state.paused
+    ? state.phaseRemainingMs
+    : Math.max(0, state.phaseEndsAt - Date.now());
+  const repsAfterThis = state.reps - state.currentRep - 1;
+  return Math.max(0, repsAfterThis * state.intervalSeconds * 1000 + remainingMs);
+}
+
+function updateTimeStat(workoutRemainingMs) {
+  if (!el.topPanelLabel || !el.workoutTimer) return;
+  if (state.showElapsed) {
+    el.topPanelLabel.textContent = 'ELAPSED';
+    el.workoutTimer.textContent = formatClock(Math.max(0, state.totalWorkoutMs - workoutRemainingMs));
+  } else {
+    el.topPanelLabel.textContent = 'REMAINING';
+    el.workoutTimer.textContent = formatClock(workoutRemainingMs);
+  }
+}
+
+function updateFinishedTimeStat() {
+  if (!el.topPanelLabel || !el.workoutTimer) return;
+  if (state.showElapsed) {
+    el.topPanelLabel.textContent = 'ELAPSED';
+    el.workoutTimer.textContent = formatClock(state.totalWorkoutMs);
+  } else {
+    el.topPanelLabel.textContent = 'WORKOUT';
+    el.workoutTimer.textContent = 'DONE';
+  }
+  el.workoutTimer.className = 'stat-value';
+}
+
+function updateRepsStat() {
+  if (!el.repsStatLabel || !el.statRepsDone) return;
+  if (state.showRepsLeft) {
+    el.repsStatLabel.textContent = 'REPS LEFT';
+    el.statRepsDone.textContent = `${Math.max(0, state.reps - state.currentRep)}`;
+  } else {
+    el.repsStatLabel.textContent = 'REPS DONE';
+    el.statRepsDone.textContent = `${state.currentRep}/${state.reps}`;
+  }
+}
+
+function toggleTimeStat() {
+  state.showElapsed = !state.showElapsed;
+  if (state.currentPhase === 'finished') {
+    updateFinishedTimeStat();
+  } else {
+    updateTimeStat(computeWorkoutRemainingMs());
+  }
+}
+
+function toggleRepsStat() {
+  state.showRepsLeft = !state.showRepsLeft;
+  updateRepsStat();
+}
+
+window.toggleTimeStat = toggleTimeStat;
+window.toggleRepsStat = toggleRepsStat;
+
 function renderActivePhase() {
   if (state.currentPhase === 'idle' || state.currentPhase === 'finished') return;
 
@@ -410,12 +476,10 @@ function renderActivePhase() {
     el.status.textContent = state.paused ? '⏸ PAUSED' : 'GET READY IN';
     el.bigTimer.textContent = formatClock(remainingMs);
     el.bigTimer.className = '';
-    if (el.workoutTimer) {
-      el.workoutTimer.textContent = formatClock(state.totalWorkoutMs);
-      el.workoutTimer.className = 'stat-value dimmed';
-    }
+    updateTimeStat(state.totalWorkoutMs);
+    if (el.workoutTimer) el.workoutTimer.className = 'stat-value dimmed';
     el.repCount.textContent = `0 of ${state.reps}`;
-    if (el.statRepsDone) el.statRepsDone.textContent = `0/${state.reps}`;
+    updateRepsStat();
     setRingProgress(remainingMs / (PREP_SECONDS * 1000));
     return;
   }
@@ -429,12 +493,10 @@ function renderActivePhase() {
     el.status.textContent = state.paused ? '⏸ PAUSED' : (isLastRep ? 'LAST REP' : 'NEXT REP IN');
     el.bigTimer.textContent = formatClock(remainingMs);
     el.bigTimer.className = '';
-    if (el.workoutTimer) {
-      el.workoutTimer.textContent = formatClock(workoutRemainingMs);
-      el.workoutTimer.className = 'stat-value';
-    }
+    updateTimeStat(workoutRemainingMs);
+    if (el.workoutTimer) el.workoutTimer.className = 'stat-value';
     el.repCount.textContent = `Rep ${state.currentRep + 1} of ${state.reps}`;
-    if (el.statRepsDone) el.statRepsDone.textContent = `${state.currentRep}/${state.reps}`;
+    updateRepsStat();
     setRingProgress(remainingMs / (state.intervalSeconds * 1000));
   }
 }
@@ -510,15 +572,11 @@ function finishWorkout(runId) {
   }
 
   el.status.textContent = 'WELL DONE';
-  if (el.workoutTimer) {
-    el.workoutTimer.textContent = 'DONE';
-    el.workoutTimer.className = 'stat-value';
-  }
-  if (el.topPanelLabel) el.topPanelLabel.textContent = 'WORKOUT';
+  updateFinishedTimeStat();
   el.bigTimer.textContent = `${state.reps}`;
   el.bigTimer.className = 'done';
   const totalMinutes = parseFloat(((state.reps * state.intervalSeconds) / 60).toFixed(1));
-  if (el.statRepsDone) el.statRepsDone.textContent = `${state.reps}/${state.reps}`;
+  updateRepsStat();
   setMessage(`Proud of you! · ${totalMinutes} min`);
   setRingProgress(1);
 
@@ -633,6 +691,8 @@ function resetTimer() {
   state.currentRep = 0;
   state.reps = 0;
   state.intervalSeconds = 0;
+  state.showElapsed = false;
+  state.showRepsLeft = false;
 
   // Cancel/clear any celebration artifacts.
   if (el.confettiContainer) {
@@ -655,6 +715,7 @@ function resetTimer() {
   el.status.textContent = "Ready";
   setMessage("REP TIMER");
   el.repCount.textContent = "";
+  if (el.repsStatLabel) el.repsStatLabel.textContent = 'REPS DONE';
   if (el.statRepsDone) el.statRepsDone.textContent = "";
   el.bigTimer.textContent = "Ready";
 

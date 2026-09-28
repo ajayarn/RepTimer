@@ -434,6 +434,15 @@ h1 {
   border-radius: 20px;
   background: var(--surface);
   box-shadow: var(--neu-raised-sm);
+  border: none;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: box-shadow 0.15s;
+}
+
+.stat-card:active {
+  box-shadow: var(--neu-inset-sm);
 }
 
 .stat-label {

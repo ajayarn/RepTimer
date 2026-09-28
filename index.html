@@ -87,16 +87,16 @@
           </div>
         </div>
 
-        <!-- Stats: reps done / total remaining -->
+        <!-- Stats: reps done/left (tap to toggle) / remaining/elapsed (tap to toggle) -->
         <div id="stat-row">
-          <div class="stat-card">
-            <div class="stat-label">REPS DONE</div>
+          <button type="button" class="stat-card" id="reps-stat-btn" aria-label="Toggle reps done / reps left">
+            <div id="reps-stat-label" class="stat-label">REPS DONE</div>
             <div id="stat-reps-done" class="stat-value accent">0/40</div>
-          </div>
-          <div class="stat-card">
+          </button>
+          <button type="button" class="stat-card" id="time-stat-btn" aria-label="Toggle remaining / elapsed time">
             <div id="top-panel-label" class="stat-label">REMAINING</div>
             <div id="workout-timer" class="stat-value" aria-live="polite" aria-atomic="true">20:00</div>
-          </div>
+          </button>
         </div>
 
         <!-- Controls -->
@@ -121,10 +121,14 @@
         const pauseBtn = document.getElementById('pause-btn');
         const resetBtn = document.getElementById('reset-btn');
         const themeToggleBtn = document.getElementById('theme-toggle');
+        const repsStatBtn = document.getElementById('reps-stat-btn');
+        const timeStatBtn = document.getElementById('time-stat-btn');
         if (startBtn) startBtn.addEventListener('click', startTimer);
         if (pauseBtn) pauseBtn.addEventListener('click', pauseTimer);
         if (resetBtn) resetBtn.addEventListener('click', resetTimer);
         if (themeToggleBtn) themeToggleBtn.addEventListener('click', toggleTheme);
+        if (repsStatBtn) repsStatBtn.addEventListener('click', toggleRepsStat);
+        if (timeStatBtn) timeStatBtn.addEventListener('click', toggleTimeStat);
       })();
     </script>
   </body>
