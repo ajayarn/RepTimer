@@ -70,7 +70,6 @@ const el = {
   workoutTimer:  document.getElementById('workout-timer'),
   ringProgress:  document.getElementById('ring-progress'),
   ringCenter:    document.getElementById('ring-center'),
-  statElapsed:   document.getElementById('stat-elapsed'),
   statRepsDone:  document.getElementById('stat-reps-done'),
   themeToggle:   document.getElementById('theme-toggle'),
   repPaceHint:   document.getElementById('rep-pace-hint'),
@@ -416,7 +415,6 @@ function renderActivePhase() {
       el.workoutTimer.className = 'stat-value dimmed';
     }
     el.repCount.textContent = `0 of ${state.reps}`;
-    if (el.statElapsed) el.statElapsed.textContent = formatClock(0);
     if (el.statRepsDone) el.statRepsDone.textContent = `0/${state.reps}`;
     setRingProgress(remainingMs / (PREP_SECONDS * 1000));
     return;
@@ -426,7 +424,6 @@ function renderActivePhase() {
     // Total remaining = remaining reps after this one × interval + current rep remaining
     const repsAfterThis = state.reps - state.currentRep - 1;
     const workoutRemainingMs = Math.max(0, repsAfterThis * state.intervalSeconds * 1000 + remainingMs);
-    const elapsedMs = Math.max(0, state.totalWorkoutMs - workoutRemainingMs);
 
     const isLastRep = (state.currentRep === state.reps - 1);
     el.status.textContent = state.paused ? '⏸ PAUSED' : (isLastRep ? 'LAST REP' : 'NEXT REP IN');
@@ -437,7 +434,6 @@ function renderActivePhase() {
       el.workoutTimer.className = 'stat-value';
     }
     el.repCount.textContent = `Rep ${state.currentRep + 1} of ${state.reps}`;
-    if (el.statElapsed) el.statElapsed.textContent = formatClock(elapsedMs);
     if (el.statRepsDone) el.statRepsDone.textContent = `${state.currentRep}/${state.reps}`;
     setRingProgress(remainingMs / (state.intervalSeconds * 1000));
   }
@@ -522,7 +518,6 @@ function finishWorkout(runId) {
   el.bigTimer.textContent = `${state.reps}`;
   el.bigTimer.className = 'done';
   const totalMinutes = parseFloat(((state.reps * state.intervalSeconds) / 60).toFixed(1));
-  if (el.statElapsed) el.statElapsed.textContent = formatClock(state.totalWorkoutMs);
   if (el.statRepsDone) el.statRepsDone.textContent = `${state.reps}/${state.reps}`;
   setMessage(`Proud of you! · ${totalMinutes} min`);
   setRingProgress(1);
@@ -660,7 +655,6 @@ function resetTimer() {
   el.status.textContent = "Ready";
   setMessage("REP TIMER");
   el.repCount.textContent = "";
-  if (el.statElapsed) el.statElapsed.textContent = "";
   if (el.statRepsDone) el.statRepsDone.textContent = "";
   el.bigTimer.textContent = "Ready";
 
