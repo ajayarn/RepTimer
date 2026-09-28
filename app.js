@@ -644,7 +644,7 @@ function resetTimer() {
   // Switch back to setup screen
   if (el.activeScreen) el.activeScreen.hidden = true;
   if (el.setupScreen) el.setupScreen.hidden = false;
-  if (el.topPanelLabel) el.topPanelLabel.textContent = 'TOTAL REMAINING';
+  if (el.topPanelLabel) el.topPanelLabel.textContent = 'REMAINING';
 
   // Restore workout-timer display
   if (el.workoutTimer) {
