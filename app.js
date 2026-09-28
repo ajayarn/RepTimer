@@ -68,12 +68,19 @@ const el = {
   setupScreen:   document.getElementById('setup-screen'),
   activeScreen:  document.getElementById('active-screen'),
   workoutTimer:  document.getElementById('workout-timer'),
-  dotGrid:       document.getElementById('dot-grid'),
-  dotGridCount:  document.getElementById('dot-grid-count'),
+  ringProgress:  document.getElementById('ring-progress'),
+  ringCenter:    document.getElementById('ring-center'),
+  statElapsed:   document.getElementById('stat-elapsed'),
+  statRepsDone:  document.getElementById('stat-reps-done'),
+  themeToggle:   document.getElementById('theme-toggle'),
   repPaceHint:   document.getElementById('rep-pace-hint'),
   topPanelLabel:    document.getElementById('top-panel-label'),
   validationError:  document.getElementById('validation-error'),
 };
+
+const ringCircumference = el.ringProgress
+  ? 2 * Math.PI * el.ringProgress.r.baseVal.value
+  : 0;
 
 const state = {
   activeTimeout: null,
@@ -89,7 +96,6 @@ const state = {
   phaseRemainingMs: 0,
   phaseEndsAt: 0,
 
-  audioContext: null,
   runId: 0, // invalidates stale async callbacks
 
   workoutType: null,    // '6count' | 'navyseals' | null
@@ -174,6 +180,14 @@ function renderHistoryChart(entries) {
 
   const labels = [...new Set(sorted.map((e) => e.date))].sort();
 
+  const isLight = currentTheme() === 'light';
+  const tickColor = isLight ? '#4a5064' : '#f0f0f0';
+  const gridColor = isLight ? '#c7cbd6' : '#333';
+
+  const rootStyle = getComputedStyle(document.documentElement);
+  const accentColor = rootStyle.getPropertyValue('--accent').trim();
+  const blueColor = rootStyle.getPropertyValue('--blue').trim();
+
   state.chartInstance = new Chart(el.historyChartCanvas, {
     type: 'line',
     data: {
@@ -185,8 +199,8 @@ function renderHistoryChart(entries) {
             const e = sorted.filter((x) => x.type === '6count' && x.date === d).pop();
             return e ? e.reps : null;
           }),
-          borderColor: '#27ae60',
-          backgroundColor: 'rgba(39,174,96,0.15)',
+          borderColor: accentColor,
+          backgroundColor: hexToRgba(accentColor, 0.15),
           tension: 0.3,
           pointRadius: 5,
           fill: true,
@@ -198,8 +212,8 @@ function renderHistoryChart(entries) {
             const e = sorted.filter((x) => x.type === 'navyseals' && x.date === d).pop();
             return e ? e.reps : null;
           }),
-          borderColor: '#3498db',
-          backgroundColor: 'rgba(52,152,219,0.15)',
+          borderColor: blueColor,
+          backgroundColor: hexToRgba(blueColor, 0.15),
           tension: 0.3,
           pointRadius: 5,
           fill: true,
@@ -212,18 +226,18 @@ function renderHistoryChart(entries) {
       scales: {
         x: {
           type: 'category',
-          ticks: { color: '#f0f0f0', maxRotation: 45, font: { family: 'Oswald' } },
-          grid: { color: '#333' },
+          ticks: { color: tickColor, maxRotation: 45, font: { family: 'Oswald' } },
+          grid: { color: gridColor },
         },
         y: {
           beginAtZero: true,
-          ticks: { color: '#f0f0f0', font: { family: 'Oswald' } },
-          grid: { color: '#333' },
-          title: { display: true, text: 'Reps', color: '#f0f0f0' },
+          ticks: { color: tickColor, font: { family: 'Oswald' } },
+          grid: { color: gridColor },
+          title: { display: true, text: 'Reps', color: tickColor },
         },
       },
       plugins: {
-        legend: { labels: { color: '#f0f0f0', font: { family: 'Oswald' } } },
+        legend: { labels: { color: tickColor, font: { family: 'Oswald' } } },
       },
     },
   });
@@ -236,75 +250,22 @@ function renderHistory() {
 }
 
 
-function getAudioContext() {
-  if (state.audioContext) {
-    if (state.audioContext.state === "suspended") {
-      state.audioContext.resume().catch((err) => {
-        console.warn("Audio resume failed:", err);
-      });
-    }
-    return state.audioContext;
-  }
+const beepSound = new Audio('timersounds/timer_beep.mp3');
+const missionCompleteSound = new Audio('timersounds/mission_complete.mp3');
 
-  const Ctx = window.AudioContext || window.webkitAudioContext;
-  if (!Ctx) return null;
-
-  state.audioContext = new Ctx();
-  if (state.audioContext.state === "suspended") {
-    state.audioContext.resume().catch((err) => {
-      console.warn("Audio resume failed:", err);
-    });
-  }
-  return state.audioContext;
+function playSound(audio) {
+  audio.currentTime = 0;
+  audio.play().catch((err) => {
+    console.warn('Audio playback failed:', err);
+  });
 }
 
 function beep() {
-  const ctx = getAudioContext();
-  if (!ctx) return;
-
-  const oscillator = ctx.createOscillator();
-  const gainNode = ctx.createGain();
-
-  oscillator.type = "sine";
-  oscillator.frequency.setValueAtTime(1000, ctx.currentTime);
-  gainNode.gain.setValueAtTime(0.15, ctx.currentTime);
-
-  oscillator.connect(gainNode);
-  gainNode.connect(ctx.destination);
-
-  oscillator.start();
-  oscillator.stop(ctx.currentTime + 0.2);
+  playSound(beepSound);
 }
 
-function playFinishTune() {
-  const ctx = getAudioContext();
-  if (!ctx) return;
-
-  // Ascending C-major arpeggio: C5 E5 G5 C6
-  const notes = [
-    { freq: 523.25, start: 0.0,  dur: 0.14 },
-    { freq: 659.25, start: 0.12, dur: 0.14 },
-    { freq: 784.0,  start: 0.24, dur: 0.14 },
-    { freq: 1046.5, start: 0.36, dur: 0.7  },
-  ];
-
-  notes.forEach(({ freq, start, dur }) => {
-    const osc  = ctx.createOscillator();
-    const gain = ctx.createGain();
-
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(freq, ctx.currentTime + start);
-
-    gain.gain.setValueAtTime(0, ctx.currentTime + start);
-    gain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + start + 0.025);
-    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + start + dur);
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    osc.start(ctx.currentTime + start);
-    osc.stop(ctx.currentTime + start + dur + 0.05);
-  });
+function playMissionComplete() {
+  playSound(missionCompleteSound);
 }
 
 function formatClock(totalMs) {
@@ -314,31 +275,57 @@ function formatClock(totalMs) {
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }
 
-function updateProgress() {
-  updateDotGrid(state.currentRep);
+function hexToRgba(hex, alpha) {
+  const clean = hex.replace('#', '');
+  const r = parseInt(clean.substring(0, 2), 16);
+  const g = parseInt(clean.substring(2, 4), 16);
+  const b = parseInt(clean.substring(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-function buildDotGrid(reps) {
-  if (!el.dotGrid) return;
-  el.dotGrid.innerHTML = '';
-  for (let i = 0; i < reps; i++) {
-    const dot = document.createElement('span');
-    dot.className = 'dot';
-    el.dotGrid.appendChild(dot);
+function initRing() {
+  if (!el.ringProgress) return;
+  el.ringProgress.style.strokeDasharray = String(ringCircumference);
+  el.ringProgress.style.strokeDashoffset = '0';
+}
+
+function setRingProgress(fraction) {
+  if (!el.ringProgress || !ringCircumference) return;
+  const clamped = Math.max(0, Math.min(1, fraction));
+  el.ringProgress.style.strokeDashoffset = String(ringCircumference * (1 - clamped));
+  if (el.ringCenter) el.ringCenter.setAttribute('aria-valuenow', String(Math.round(clamped * 100)));
+}
+
+const THEME_KEY = window.REPTIMER_THEME_KEY || 'reptimer_theme';
+
+function currentTheme() {
+  return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+}
+
+function syncThemeToggleButton() {
+  if (!el.themeToggle) return;
+  const theme = currentTheme();
+  el.themeToggle.textContent = theme === 'light' ? '🌙' : '☀️';
+  el.themeToggle.setAttribute('aria-label', theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
+}
+
+function toggleTheme() {
+  const next = currentTheme() === 'light' ? 'dark' : 'light';
+  if (next === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light');
+  } else {
+    document.documentElement.removeAttribute('data-theme');
   }
-  el.dotGrid.setAttribute('aria-valuemax', String(reps));
-  el.dotGrid.setAttribute('aria-valuenow', '0');
+  try {
+    localStorage.setItem(THEME_KEY, next);
+  } catch (_) {
+    // Storage unavailable — theme just won't persist across reloads.
+  }
+  syncThemeToggleButton();
+  renderHistory();
 }
 
-function updateDotGrid(completedReps, currentRep = -1) {
-  if (!el.dotGrid) return;
-  const dots = el.dotGrid.querySelectorAll('.dot');
-  dots.forEach((dot, i) => {
-    dot.classList.toggle('dot--done', i < completedReps);
-    dot.classList.toggle('dot--current', i === currentRep);
-  });
-  el.dotGrid.setAttribute('aria-valuenow', String(completedReps));
-}
+window.toggleTheme = toggleTheme;
 
 function updateRepPaceHint() {
   if (!el.repPaceHint) return;
@@ -383,7 +370,6 @@ function setWorkoutTypeBadge(type) {
   }
   el.workoutTypeBadge.removeAttribute('hidden');
   el.workoutTypeBadge.textContent = type === '6count' ? '6-COUNT' : 'NAVY SEALS';
-  el.workoutTypeBadge.className = `workout-type-badge workout-type-badge--${type}`;
 }
 
 function setButtonState(mode) {
@@ -424,13 +410,15 @@ function renderActivePhase() {
   if (state.currentPhase === 'prep') {
     el.status.textContent = state.paused ? '⏸ PAUSED' : 'GET READY IN';
     el.bigTimer.textContent = formatClock(remainingMs);
-    el.bigTimer.className = 'prep';
+    el.bigTimer.className = '';
     if (el.workoutTimer) {
       el.workoutTimer.textContent = formatClock(state.totalWorkoutMs);
-      el.workoutTimer.className = 'dimmed';
+      el.workoutTimer.className = 'stat-value dimmed';
     }
     el.repCount.textContent = `0 of ${state.reps}`;
-    if (el.dotGridCount) el.dotGridCount.textContent = `0 / ${state.reps}`;
+    if (el.statElapsed) el.statElapsed.textContent = formatClock(0);
+    if (el.statRepsDone) el.statRepsDone.textContent = `0/${state.reps}`;
+    setRingProgress(remainingMs / (PREP_SECONDS * 1000));
     return;
   }
 
@@ -438,6 +426,7 @@ function renderActivePhase() {
     // Total remaining = remaining reps after this one × interval + current rep remaining
     const repsAfterThis = state.reps - state.currentRep - 1;
     const workoutRemainingMs = Math.max(0, repsAfterThis * state.intervalSeconds * 1000 + remainingMs);
+    const elapsedMs = Math.max(0, state.totalWorkoutMs - workoutRemainingMs);
 
     const isLastRep = (state.currentRep === state.reps - 1);
     el.status.textContent = state.paused ? '⏸ PAUSED' : (isLastRep ? 'LAST REP' : 'NEXT REP IN');
@@ -445,11 +434,12 @@ function renderActivePhase() {
     el.bigTimer.className = '';
     if (el.workoutTimer) {
       el.workoutTimer.textContent = formatClock(workoutRemainingMs);
-      el.workoutTimer.className = '';
+      el.workoutTimer.className = 'stat-value';
     }
     el.repCount.textContent = `Rep ${state.currentRep + 1} of ${state.reps}`;
-    if (el.dotGridCount) el.dotGridCount.textContent = `${state.currentRep + 1} / ${state.reps}`;
-    updateDotGrid(state.currentRep, state.currentRep);
+    if (el.statElapsed) el.statElapsed.textContent = formatClock(elapsedMs);
+    if (el.statRepsDone) el.statRepsDone.textContent = `${state.currentRep}/${state.reps}`;
+    setRingProgress(remainingMs / (state.intervalSeconds * 1000));
   }
 }
 
@@ -477,7 +467,6 @@ function runPhaseCompletion(runId) {
     }
 
     beep();
-    updateProgress();
 
     state.phaseRemainingMs = state.intervalSeconds * 1000;
     startCurrentPhase(runId);
@@ -527,18 +516,18 @@ function finishWorkout(runId) {
   el.status.textContent = 'WELL DONE';
   if (el.workoutTimer) {
     el.workoutTimer.textContent = 'DONE';
-    el.workoutTimer.className = '';
+    el.workoutTimer.className = 'stat-value';
   }
   if (el.topPanelLabel) el.topPanelLabel.textContent = 'WORKOUT';
   el.bigTimer.textContent = `${state.reps}`;
   el.bigTimer.className = 'done';
   const totalMinutes = parseFloat(((state.reps * state.intervalSeconds) / 60).toFixed(1));
-  el.repCount.textContent = `reps · ${totalMinutes} min`;
-  if (el.dotGridCount) el.dotGridCount.textContent = `${state.reps} / ${state.reps}`;
-  setMessage('Proud of you!');
-  updateDotGrid(state.reps); // fill all dots
+  if (el.statElapsed) el.statElapsed.textContent = formatClock(state.totalWorkoutMs);
+  if (el.statRepsDone) el.statRepsDone.textContent = `${state.reps}/${state.reps}`;
+  setMessage(`Proud of you! · ${totalMinutes} min`);
+  setRingProgress(1);
 
-  playFinishTune();
+  playMissionComplete();
   setButtonState("finished");
 
   setTimeout(() => {
@@ -576,8 +565,15 @@ function validateInputs() {
   return { ok: true, time, reps: nextReps, intervalSeconds };
 }
 
-function primeClapAudio() {
-  getAudioContext(); // warm up audio context on user interaction
+function primeAudioPlayback() {
+  // Unlock playback on user interaction so later programmatic .play() calls
+  // (from setTimeout callbacks, with no direct user gesture) aren't blocked.
+  [beepSound, missionCompleteSound].forEach((audio) => {
+    audio.play().then(() => {
+      audio.pause();
+      audio.currentTime = 0;
+    }).catch(() => {});
+  });
 }
 
 function startTimer() {
@@ -606,13 +602,9 @@ function startTimer() {
   if (el.activeScreen) el.activeScreen.hidden = false;
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  // Build dot grid
-  buildDotGrid(state.reps);
-
   setWorkoutTypeBadge(state.workoutType);
 
-  primeClapAudio();
-  updateProgress();
+  primeAudioPlayback();
   startCurrentPhase(runId);
 }
 
@@ -652,27 +644,24 @@ function resetTimer() {
     el.confettiContainer.innerHTML = "";
   }
 
-
-  updateProgress();
+  setRingProgress(1);
 
   // Switch back to setup screen
   if (el.activeScreen) el.activeScreen.hidden = true;
   if (el.setupScreen) el.setupScreen.hidden = false;
   if (el.topPanelLabel) el.topPanelLabel.textContent = 'TOTAL REMAINING';
 
-  // Clear dot grid
-  if (el.dotGrid) el.dotGrid.innerHTML = '';
-
   // Restore workout-timer display
   if (el.workoutTimer) {
     el.workoutTimer.textContent = '—';
-    el.workoutTimer.className = 'dimmed';
+    el.workoutTimer.className = 'stat-value dimmed';
   }
 
   el.status.textContent = "Ready";
   setMessage("REP TIMER");
   el.repCount.textContent = "";
-  if (el.dotGridCount) el.dotGridCount.textContent = "";
+  if (el.statElapsed) el.statElapsed.textContent = "";
+  if (el.statRepsDone) el.statRepsDone.textContent = "";
   el.bigTimer.textContent = "Ready";
 
   setWorkoutTypeBadge(null);
@@ -715,6 +704,8 @@ window.pauseTimer = pauseTimer;
 window.resetTimer = resetTimer;
 
 wireAccessibility();
+initRing();
+syncThemeToggleButton();
 resetTimer();
 
 if (el.time)  el.time.addEventListener('input', updateRepPaceHint);

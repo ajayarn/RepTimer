@@ -4,10 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Rep Timer</title>
+    <script>
+      window.REPTIMER_THEME_KEY = 'reptimer_theme';
+      (function () {
+        try {
+          if (localStorage.getItem(window.REPTIMER_THEME_KEY) === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+          }
+        } catch (e) {}
+      })();
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <button id="theme-toggle" type="button" aria-label="Switch to light theme">☀️</button>
     <main aria-label="Rep Timer app">
 
       <!-- ── SETUP SCREEN ─────────────────────────── -->
@@ -56,26 +67,40 @@
       <!-- ── ACTIVE SCREEN ────────────────────────── -->
       <div id="active-screen" hidden>
 
-        <!-- Top: total workout clock -->
-        <div id="top-panel">
-          <div class="panel-label" id="top-panel-label">TOTAL REMAINING</div>
-          <div id="workout-timer" aria-live="polite" aria-atomic="true">20:00</div>
+        <!-- Header: workout type + which rep -->
+        <div id="active-header">
           <div id="workout-type-badge" class="workout-type-badge" hidden></div>
+          <div id="rep-count" aria-live="polite">0 of 40</div>
         </div>
 
-        <!-- Middle: dot grid -->
-        <div id="dot-grid-count" aria-hidden="true"></div>
-        <div id="dot-grid" role="progressbar"
-          aria-label="Rep progress" aria-valuemin="0"
-          aria-valuemax="100" aria-valuenow="0"></div>
+        <!-- Ring: per-rep countdown -->
+        <div id="ring-wrap">
+          <svg id="ring-svg" viewBox="0 0 220 220" aria-hidden="true">
+            <circle class="ring-track" cx="110" cy="110" r="95"></circle>
+            <circle id="ring-progress" class="ring-progress" cx="110" cy="110" r="95"></circle>
+          </svg>
+          <div id="ring-center" role="progressbar" aria-label="Time until next rep"
+            aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
+            <div id="status" role="status" aria-live="polite" aria-atomic="true">READY</div>
+            <div id="big-timer" aria-live="polite" aria-atomic="true">00:00</div>
+            <div id="message" aria-live="polite"></div>
+          </div>
+        </div>
 
-        <!-- Bottom: per-rep countdown -->
-        <div id="bottom-panel">
-          <div id="status" class="panel-label"
-            role="status" aria-live="polite" aria-atomic="true">READY</div>
-          <div id="big-timer" aria-live="polite" aria-atomic="true">00:00</div>
-          <div id="rep-count" aria-live="polite">0 of 40</div>
-          <div id="message" aria-live="polite"></div>
+        <!-- Stats: elapsed / reps done / remaining -->
+        <div id="stat-row">
+          <div class="stat-card">
+            <div class="stat-label">ELAPSED</div>
+            <div id="stat-elapsed" class="stat-value">00:00</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">REPS DONE</div>
+            <div id="stat-reps-done" class="stat-value accent">0/40</div>
+          </div>
+          <div class="stat-card">
+            <div id="top-panel-label" class="stat-label">REMAINING</div>
+            <div id="workout-timer" class="stat-value" aria-live="polite" aria-atomic="true">20:00</div>
+          </div>
         </div>
 
         <!-- Controls -->
@@ -99,9 +124,11 @@
         const startBtn = document.getElementById('start-btn');
         const pauseBtn = document.getElementById('pause-btn');
         const resetBtn = document.getElementById('reset-btn');
+        const themeToggleBtn = document.getElementById('theme-toggle');
         if (startBtn) startBtn.addEventListener('click', startTimer);
         if (pauseBtn) pauseBtn.addEventListener('click', pauseTimer);
         if (resetBtn) resetBtn.addEventListener('click', resetTimer);
+        if (themeToggleBtn) themeToggleBtn.addEventListener('click', toggleTheme);
       })();
     </script>
   </body>
