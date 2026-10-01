@@ -268,11 +268,6 @@ h1 {
 .legend-dot--6count { color: var(--accent); }
 .legend-dot--navyseals { color: var(--blue); }
 
-#history-chart {
-  width: 100% !important;
-  max-height: 180px;
-}
-
 #history-log {
   margin-top: 12px;
 }

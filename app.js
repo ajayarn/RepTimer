@@ -60,7 +60,6 @@ const el = {
   confettiContainer: document.getElementById("confetti-container"),
 
   historyPanel:       document.getElementById('history-panel'),
-  historyChartCanvas: document.getElementById('history-chart'),
   historyLog:         document.getElementById('history-log'),
 
   workoutTypeBadge: document.getElementById('workout-type-badge'),
@@ -99,7 +98,6 @@ const state = {
   runId: 0, // invalidates stale async callbacks
 
   workoutType: null,    // '6count' | 'navyseals' | null
-  chartInstance: null,  // Chart.js instance reference for destroy/recreate
   totalWorkoutMs: 0,
 
   showElapsed: false,   // time stat: false = REMAINING, true = ELAPSED
@@ -144,6 +142,7 @@ function selectWorkoutType(type) {
   const last = getLastEntryForType(type);
   if (last) {
     el.reps.value = last.reps;
+    el.time.value = last.minutes;
   }
   updateRepPaceHint();
 }
@@ -168,87 +167,8 @@ function renderHistoryLog(entries) {
   }).join('');
 }
 
-function renderHistoryChart(entries) {
-  if (!el.historyChartCanvas || typeof Chart === 'undefined') return;
-
-  if (state.chartInstance) {
-    state.chartInstance.destroy();
-    state.chartInstance = null;
-  }
-
-  const sorted = entries
-    .slice()
-    .sort((a, b) => (a.completedAt < b.completedAt ? -1 : 1))
-    .slice(-30);
-
-  const labels = [...new Set(sorted.map((e) => e.date))].sort();
-
-  const isLight = currentTheme() === 'light';
-  const tickColor = isLight ? '#4a5064' : '#f0f0f0';
-  const gridColor = isLight ? '#c7cbd6' : '#333';
-
-  const rootStyle = getComputedStyle(document.documentElement);
-  const accentColor = rootStyle.getPropertyValue('--accent').trim();
-  const blueColor = rootStyle.getPropertyValue('--blue').trim();
-
-  state.chartInstance = new Chart(el.historyChartCanvas, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: '6-Count',
-          data: labels.map((d) => {
-            const e = sorted.filter((x) => x.type === '6count' && x.date === d).pop();
-            return e ? e.reps : null;
-          }),
-          borderColor: accentColor,
-          backgroundColor: hexToRgba(accentColor, 0.15),
-          tension: 0.3,
-          pointRadius: 5,
-          fill: true,
-          spanGaps: true,
-        },
-        {
-          label: 'Navy Seals',
-          data: labels.map((d) => {
-            const e = sorted.filter((x) => x.type === 'navyseals' && x.date === d).pop();
-            return e ? e.reps : null;
-          }),
-          borderColor: blueColor,
-          backgroundColor: hexToRgba(blueColor, 0.15),
-          tension: 0.3,
-          pointRadius: 5,
-          fill: true,
-          spanGaps: true,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      scales: {
-        x: {
-          type: 'category',
-          ticks: { color: tickColor, maxRotation: 45, font: { family: 'Oswald' } },
-          grid: { color: gridColor },
-        },
-        y: {
-          beginAtZero: true,
-          ticks: { color: tickColor, font: { family: 'Oswald' } },
-          grid: { color: gridColor },
-          title: { display: true, text: 'Reps', color: tickColor },
-        },
-      },
-      plugins: {
-        legend: { labels: { color: tickColor, font: { family: 'Oswald' } } },
-      },
-    },
-  });
-}
-
 function renderHistory() {
   const log = loadLog();
-  renderHistoryChart(log);
   renderHistoryLog(log);
 }
 
@@ -276,14 +196,6 @@ function formatClock(totalMs) {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-}
-
-function hexToRgba(hex, alpha) {
-  const clean = hex.replace('#', '');
-  const r = parseInt(clean.substring(0, 2), 16);
-  const g = parseInt(clean.substring(2, 4), 16);
-  const b = parseInt(clean.substring(4, 6), 16);
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
 function initRing() {
@@ -325,7 +237,6 @@ function toggleTheme() {
     // Storage unavailable — theme just won't persist across reloads.
   }
   syncThemeToggleButton();
-  renderHistory();
 }
 
 window.toggleTheme = toggleTheme;
