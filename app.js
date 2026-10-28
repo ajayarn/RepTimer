@@ -24,8 +24,12 @@ function loadLog() {
 }
 
 function saveEntry(entry) {
-  const log = loadLog();
-  log.push(entry);
+  saveEntries([entry]);
+}
+
+function saveEntries(entries) {
+  if (entries.length === 0) return;
+  const log = loadLog().concat(entries);
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(log));
   } catch (_) {
@@ -61,6 +65,9 @@ const el = {
 
   historyPanel:       document.getElementById('history-panel'),
   historyLog:         document.getElementById('history-log'),
+  exportCsvBtn:       document.getElementById('export-csv-btn'),
+  importCsvInput:     document.getElementById('import-csv-input'),
+  importStatus:       document.getElementById('import-status'),
 
   workoutTypeBadge: document.getElementById('workout-type-badge'),
 
@@ -170,7 +177,119 @@ function renderHistoryLog(entries) {
 function renderHistory() {
   const log = loadLog();
   renderHistoryLog(log);
+  if (el.exportCsvBtn) el.exportCsvBtn.disabled = log.length === 0;
 }
+
+const CSV_COLUMNS = ['type', 'date', 'minutes', 'reps', 'completedAt'];
+
+function exportHistoryCsv() {
+  const log = loadLog();
+  if (log.length === 0) return;
+
+  const rows = log.map((entry) => CSV_COLUMNS.map((col) => entry[col]).join(','));
+  const csv = [CSV_COLUMNS.join(','), ...rows].join('\r\n');
+
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `reptimer-history-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+window.exportHistoryCsv = exportHistoryCsv;
+
+function setImportStatus(text) {
+  if (el.importStatus) el.importStatus.textContent = text;
+}
+
+function parseEntryRow(columns, values) {
+  const raw = {};
+  columns.forEach((col, i) => { raw[col] = (values[i] || '').trim(); });
+
+  if (raw.type !== '6count' && raw.type !== 'navyseals') return null;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(raw.date)) return null;
+
+  const minutes = parseFloat(raw.minutes);
+  if (!Number.isFinite(minutes) || minutes <= 0) return null;
+
+  const reps = parseInt(raw.reps, 10);
+  if (!Number.isFinite(reps) || reps <= 0) return null;
+
+  const completedAtMs = Date.parse(raw.completedAt);
+  if (Number.isNaN(completedAtMs)) return null;
+
+  return {
+    id: String(completedAtMs),
+    type: raw.type,
+    date: raw.date,
+    minutes,
+    reps,
+    completedAt: raw.completedAt,
+  };
+}
+
+function importHistoryCsv(text) {
+  const lines = text.split(/\r\n|\n|\r/).filter((line) => line.trim() !== '');
+  if (lines.length < 2) {
+    setImportStatus('That file has no workout rows to import.');
+    return;
+  }
+
+  const columns = lines[0].split(',').map((c) => c.trim());
+  const missing = CSV_COLUMNS.filter((c) => !columns.includes(c));
+  if (missing.length > 0) {
+    setImportStatus(`CSV is missing required column(s): ${missing.join(', ')}.`);
+    return;
+  }
+
+  const existing = new Set(loadLog().map((e) => e.completedAt));
+  const toImport = [];
+  let invalidCount = 0;
+  let duplicateCount = 0;
+
+  for (const line of lines.slice(1)) {
+    const entry = parseEntryRow(columns, line.split(','));
+    if (!entry) {
+      invalidCount++;
+      continue;
+    }
+    if (existing.has(entry.completedAt)) {
+      duplicateCount++;
+      continue;
+    }
+    existing.add(entry.completedAt);
+    toImport.push(entry);
+  }
+
+  saveEntries(toImport);
+  renderHistory();
+
+  const parts = [`Imported ${toImport.length} workout${toImport.length === 1 ? '' : 's'}.`];
+  if (duplicateCount > 0) parts.push(`${duplicateCount} duplicate${duplicateCount === 1 ? '' : 's'} skipped.`);
+  if (invalidCount > 0) parts.push(`${invalidCount} invalid row${invalidCount === 1 ? '' : 's'} skipped.`);
+  setImportStatus(parts.join(' '));
+}
+
+function handleImportFile(event) {
+  const input = event.target;
+  const file = input.files && input.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    importHistoryCsv(String(reader.result));
+    input.value = '';
+  };
+  reader.onerror = () => {
+    setImportStatus('Could not read that file.');
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+window.handleImportFile = handleImportFile;
 
 
 const beepSound = new Audio('timersounds/timer_beep.mp3');

@@ -61,6 +61,12 @@
             </span>
           </div>
           <div id="history-log" aria-label="Recent workouts"></div>
+          <div class="history-actions">
+            <button class="history-action-btn" id="import-csv-btn" type="button">IMPORT CSV</button>
+            <button class="history-action-btn" id="export-csv-btn" type="button">EXPORT CSV</button>
+          </div>
+          <div id="import-status" class="import-status" aria-live="polite"></div>
+          <input type="file" id="import-csv-input" accept=".csv,text/csv" hidden />
         </section>
       </div>
 
@@ -122,12 +128,18 @@
         const themeToggleBtn = document.getElementById('theme-toggle');
         const repsStatBtn = document.getElementById('reps-stat-btn');
         const timeStatBtn = document.getElementById('time-stat-btn');
+        const exportCsvBtn = document.getElementById('export-csv-btn');
+        const importCsvBtn = document.getElementById('import-csv-btn');
+        const importCsvInput = document.getElementById('import-csv-input');
         if (startBtn) startBtn.addEventListener('click', startTimer);
         if (pauseBtn) pauseBtn.addEventListener('click', pauseTimer);
         if (resetBtn) resetBtn.addEventListener('click', resetTimer);
         if (themeToggleBtn) themeToggleBtn.addEventListener('click', toggleTheme);
         if (repsStatBtn) repsStatBtn.addEventListener('click', toggleRepsStat);
         if (timeStatBtn) timeStatBtn.addEventListener('click', toggleTimeStat);
+        if (exportCsvBtn) exportCsvBtn.addEventListener('click', exportHistoryCsv);
+        if (importCsvBtn && importCsvInput) importCsvBtn.addEventListener('click', () => importCsvInput.click());
+        if (importCsvInput) importCsvInput.addEventListener('change', handleImportFile);
       })();
     </script>
   </body>
