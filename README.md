@@ -1,8 +1,8 @@
-# RepTimer
+# Cadence
 
 A simple, motivating rep-based workout timer built with vanilla HTML, CSS, and JavaScript.
 
-RepTimer helps you complete a target number of reps over a fixed workout duration, with:
+Cadence helps you complete a target number of reps over a fixed workout duration, with:
 
 - a prep countdown,
 - per-rep pacing,

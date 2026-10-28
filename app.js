@@ -1,7 +1,7 @@
 "use strict";
 
 /**
- * RepTimer app logic
+ * Cadence app logic
  * - safer validation
  * - cached DOM refs
  * - robust timeout/interval cleanup
@@ -193,7 +193,7 @@ function exportHistoryCsv() {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.download = `reptimer-history-${new Date().toISOString().slice(0, 10)}.csv`;
+  link.download = `cadence-history-${new Date().toISOString().slice(0, 10)}.csv`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -743,7 +743,7 @@ function resetTimer() {
   }
 
   el.status.textContent = "Ready";
-  setMessage("REP TIMER");
+  setMessage("CADENCE");
   el.repCount.textContent = "";
   if (el.repsStatLabel) el.repsStatLabel.textContent = 'REPS DONE';
   if (el.statRepsDone) el.statRepsDone.textContent = "";
